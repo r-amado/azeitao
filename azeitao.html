@@ -259,9 +259,11 @@ for(let x=-7.0;x<-.3;x+=.18) B(G.extra,x,x+.02,.04,.045,-1.56,7.68,'oakDark',tru
  B(gl,-3.2,-.8,.04,.42,6.6,7.4,fr); B(gl,-3.15,-.85,.42,.56,6.62,7.3,'linen'); B(gl,-3.15,-.85,.42,.85,7.2,7.38,'linen');
  [-2.85,-1.45].forEach(x=>{B(gl,x-.38,x+.38,.04,.42,4.35,5.1,fr);B(gl,x-.34,x+.34,.42,.56,4.4,5.05,'linen');B(gl,x-.34,x+.34,.42,.85,4.37,4.55,'linen');});
  B(gl,-2.6,-1.6,.04,.38,5.45,6.15,'stone');
- [1.9,2.9,5.7,6.7].forEach(z=>{B(g,-6.9,-4.9,.04,.32,z,z+.7,'oak');B(g,-6.85,-5.4,.32,.4,z+.03,z+.67,'white');
+ [-1.0,0.0,1.9,2.9,5.7,6.7].forEach(z=>{B(g,-6.9,-4.9,.04,.32,z,z+.7,'oak');B(g,-6.85,-5.4,.32,.4,z+.03,z+.67,'white');
    const bk=B(g,-5.45,-4.95,.3,.34,z+.03,z+.67,'white');bk.rotation.z=.9;bk.position.set(-5.15,.55,z+.35);});
- [[-5.2,2.75],[-5.2,6.55]].forEach(([x,z])=>cyl(g,x,z,.22,.04,.48,'stone'));
+ [[-5.2,-.15],[-5.2,2.75],[-5.2,6.55]].forEach(([x,z])=>cyl(g,x,z,.22,.04,.48,'stone'));
+ cyl(g,-6.3,1.3,.04,.04,2.4,fr); cyl(g,-6.3,1.3,.4,.04,.12,fr);
+ {const p=new THREE.Mesh(new THREE.ConeGeometry(1.5,.45,8),mat('linen'));p.position.set(-6.3,2.55,1.3);p.castShadow=true;g.add(p);}
  cyl(g,-6.3,4.6,.04,.04,2.4,fr); cyl(g,-6.3,4.6,.4,.04,.12,fr);
  {const p=new THREE.Mesh(new THREE.ConeGeometry(1.5,.45,8),mat('linen'));p.position.set(-6.3,2.55,4.6);p.castShadow=true;g.add(p);}
  [[-0.6,-1.2],[-0.6,3.6]].forEach(([x,z])=>{B(g,x-.3,x+.3,.04,.6,z-.3,z+.3,'terra');ball(g,x,.95,z,.4,'plant');});
@@ -961,8 +963,10 @@ const SWN={pine:'Pinho',garageFloor:'Betão afagado',wallOut:'Branco',wall:'Rebo
 
 // ---------- Câmara / modos ----------
 let mode='p1';
-// esconder sem perder sombras: o objecto passa para a camada 1, que a câmara não vê mas a câmara de sombras do sol vê
-function shadowOnly(g,on){g.traverse(o=>o.layers.set(on?1:0));}
+// esconder sem perder sombras
+// (o Three r147 ignora na sombra objectos fora das camadas da câmara; por isso troca-se o material por um invisível que continua a projectar sombra)
+const INVIS=new THREE.MeshBasicMaterial({colorWrite:false,depthWrite:false});
+function shadowOnly(g,on){g.traverse(o=>{if(!o.isMesh)return; if(on){if(!o.userData.m0)o.userData.m0=o.material; o.material=INVIS;} else if(o.userData.m0){o.material=o.userData.m0;}});}
 function setMode(m,fly){
   mode=m;
   document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===m));
