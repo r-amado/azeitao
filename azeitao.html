@@ -93,6 +93,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <label><input type="checkbox" data-k="xmas"> Mesa aberta (Natal, 14 lugares)</label>
   <label><input type="checkbox" data-k="pines" checked> Pinhal (desligado mantém as sombras)</label>
   <label><input type="checkbox" data-k="sauna" checked> Sauna exterior (2 pessoas)</label>
+  <label><input type="checkbox" data-k="ix2pat"> iX2 no pátio da garagem (em vez do lugar exterior)</label>
   <label class="rng" style="grid-template-columns:5.2em 1fr">Muros do pátio <select id="wallSel" style="font:inherit;font-size:13px;padding:4px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)">
     <option value="">Como está</option><option value="combo">Revest. + trepadeiras + floreiras</option><option value="climb">Trepadeiras + floreiras</option><option value="vgarden">Jardim vertical</option><option value="clad">Ripado (revestimento)</option></select></label>
   <div class="sunbox"><b>Sol e sombras</b><div id="sunTxt"></div>
@@ -172,7 +173,7 @@ SUN.set=(n,clock)=>{SUN.n=n;SUN.h=clock;const {alt,az}=SUN.pos(n,clock),b=az+29*
 
 const G={ extra:new THREE.Group(), pm1:new THREE.Group(), p0:new THREE.Group(), p1:new THREE.Group(), roof:new THREE.Group(), site:new THREE.Group() };
 Object.values(G).forEach(g=>scene.add(g));
-const OPT={goals:new THREE.Group(),cinema:new THREE.Group(),play:new THREE.Group(),trees:new THREE.Group(),lounge:new THREE.Group(),xmas:new THREE.Group(),dclosed:new THREE.Group(),pines:new THREE.Group(),sauna:new THREE.Group()}; Object.values(OPT).forEach(g=>G.extra.add(g)); G.site.add(OPT.pines);
+const OPT={goals:new THREE.Group(),cinema:new THREE.Group(),play:new THREE.Group(),trees:new THREE.Group(),lounge:new THREE.Group(),xmas:new THREE.Group(),dclosed:new THREE.Group(),pines:new THREE.Group(),sauna:new THREE.Group(),ix2out:new THREE.Group(),ix2pat:new THREE.Group()}; Object.values(OPT).forEach(g=>G.extra.add(g)); G.site.add(OPT.pines);
 
 // box por intervalos [x0,x1],[y0,y1],[z0,z1]
 function B(g,x0,x1,y0,y1,z0,z1,m,noShadow){
@@ -217,6 +218,14 @@ function slope(g,x0,x1,z0,z1,y0,y1,ax,m){const t=.3;let me;
 function pvSouth(g,x0,n,zFront,y){const pm=new THREE.MeshStandardMaterial({color:'#1F2C3D',roughness:.3,metalness:.4}),L=2.28,t=35*Math.PI/180;
   for(let i=0;i<n;i++){const xc=x0+.86+i*1.74;const m=new THREE.Mesh(new THREE.BoxGeometry(1.72,.04,L),pm);m.rotation.x=t;m.position.set(xc,y+.25+L/2*Math.sin(t),zFront-L/2*Math.cos(t));m.castShadow=true;g.add(m);}
   const w=n*1.74; B(g,x0,x0+w,y,y+.25,zFront-.06,zFront,'iron',true); B(g,x0,x0+w,y,y+.25+L*Math.sin(t),zFront-L*Math.cos(t),zFront-L*Math.cos(t)+.06,'iron',true);}
+// fiada de painéis ao alto (1,13 m de largura × 2,0 m inclinados), virados a sul
+function pvRow(g,x0,n,zFront,y,tDeg=35){const pm=new THREE.MeshStandardMaterial({color:'#1F2C3D',roughness:.3,metalness:.4}),L=2.0,t=tDeg*Math.PI/180;
+  for(let i=0;i<n;i++){const xc=x0+.567+i*1.154;const m=new THREE.Mesh(new THREE.BoxGeometry(1.134,.04,L),pm);m.rotation.x=t;m.position.set(xc,y+.25+L/2*Math.sin(t),zFront-L/2*Math.cos(t));m.castShadow=true;g.add(m);}
+  const w=n*1.154; B(g,x0,x0+w,y,y+.25,zFront-.06,zFront,'iron',true); B(g,x0,x0+w,y,y+.25+L*Math.sin(t),zFront-L*Math.cos(t),zFront-L*Math.cos(t)+.06,'iron',true);}
+// coluna de painéis deitados (2,0 m ao longo de x × 1,13 m), inclinação baixa virada a poente
+function pvWest(g,x0,z0,n,y,tDeg=10){const pm=new THREE.MeshStandardMaterial({color:'#1F2C3D',roughness:.3,metalness:.4}),L=2.0,t=tDeg*Math.PI/180;
+  for(let i=0;i<n;i++){const zc=z0+.567+i*1.154;const m=new THREE.Mesh(new THREE.BoxGeometry(L,.04,1.134),pm);m.rotation.z=t;m.position.set(x0+L/2*Math.cos(t),y+.15+L/2*Math.sin(t),zc);m.castShadow=true;g.add(m);}
+  const d=n*1.154; B(g,x0,x0+.06,y,y+.15,z0,z0+d,'iron',true); B(g,x0+L*Math.cos(t)-.06,x0+L*Math.cos(t),y,y+.15+L*Math.sin(t),z0,z0+d,'iron',true);}
 function pvTent(g,x0,z0,z1,y){const pm=new THREE.MeshStandardMaterial({color:'#1F2C3D',roughness:.3,metalness:.4}),L=1.72,t=10*Math.PI/180,w=L*Math.cos(t),h=L*Math.sin(t);
   [[x0+w/2,t],[x0+w*1.5+.05,-t]].forEach(([cx,r])=>{const n=Math.floor((z1-z0)/1.15);for(let k=0;k<n;k++){const m=new THREE.Mesh(new THREE.BoxGeometry(L,.04,1.12),pm);m.rotation.z=r;m.position.set(cx,y+.15+h/2,z0+.56+k*1.15);m.castShadow=true;g.add(m);}});
   B(g,x0,x0+2*w+.05,y,y+.15,z0,z0+.06,'iron',true); B(g,x0,x0+2*w+.05,y,y+.15,z1-.06,z1,'iron',true);}
@@ -408,7 +417,10 @@ const CARS={
   gl:[[0.4,1.13],[0.92,1.43],[1.6,1.57],[2.5,1.59],[3.22,1.31],[3.3,1.12]], bar:true},
  iX2:{L:4.55,W:1.85,col:'#4D5966',r:.355,ax:[0.92,3.61],
   body:[[0.05,0.3],[0,0.6],[0.08,0.98],[0.45,1.18],[1.1,1.46],[2.2,1.56],[2.95,1.33],[3.2,1.08],[3.95,0.98],[4.42,0.86],[4.55,0.6],[4.48,0.3]],
-  gl:[[0.55,1.17],[1.12,1.43],[2.2,1.53],[2.9,1.31],[3.05,1.12]], kidney:true}};
+  gl:[[0.55,1.17],[1.12,1.43],[2.2,1.53],[2.9,1.31],[3.05,1.12]], kidney:true},
+ Z4:{L:4.32,W:1.86,col:'#2B3A55',r:.345,ax:[0.85,3.32],
+  body:[[0.05,0.3],[0,0.6],[0.05,0.92],[0.35,1.0],[1.1,1.02],[1.38,1.27],[1.9,1.30],[2.32,1.12],[2.48,0.98],[3.6,0.88],[4.2,0.74],[4.32,0.55],[4.25,0.3]],
+  gl:[[1.42,1.02],[1.42,1.24],[1.86,1.27],[2.3,1.1],[2.42,0.99]], kidney:true}};
 function ext(pts,depth,m,bev){const sh=new THREE.Shape();pts.forEach((p,i)=>i?sh.lineTo(p[0],p[1]):sh.moveTo(p[0],p[1]));
   const g=new THREE.ExtrudeGeometry(sh,{depth,bevelEnabled:!!bev,bevelSize:bev||0,bevelThickness:bev||0,bevelSegments:3});g.translate(0,0,-depth/2);const me=new THREE.Mesh(g,m);me.castShadow=true;me.receiveShadow=true;return me}
 function makeCar(k,parent,x,y,z,rotY){const c=CARS[k],grp=new THREE.Group(),b=.06;
@@ -424,14 +436,18 @@ function makeCar(k,parent,x,y,z,rotY){const c=CARS[k],grp=new THREE.Group(),b=.0
   if(c.kidney){[-1,1].forEach(s=>{B(grp,c.L-.04,c.L+.01,.56,.8,s*.1,s*.42,dark,true);B(grp,c.L-.12,c.L-.02,.82,.86,s*.5,s*.82,glow('#F4F6FF'),true);});B(grp,0,.06,.94,.97,-c.W/2+.2,c.W/2-.2,glow('#C3262B'),true);}
   grp.children.forEach(o=>o.position.x-=c.L/2);
   grp.position.set(x,y,z);grp.rotation.y=rotY;parent.add(grp);return grp}
-makeCar('MY',gm1,16.25,FM,3.0,Math.PI/2); makeCar('iX2',gm1,19.25,FM,3.0,Math.PI/2);   // alinhados com o portão (14,90–20,60), estacionados de marcha-atrás para sair a direito
-// basquetebol: cesto na parede de suporte da escada exterior, virado ao pátio
-B(gm1,11.95,12.5,.6,.7,-3.05,-2.95,'iron'); B(gm1,12.5,12.53,FM+2.9,FM+3.95,-3.9,-2.1,new THREE.MeshStandardMaterial({color:'#FFFFFF',transparent:true,opacity:.75}),true);
-[[FM+3.0,FM+3.03,-3.3,-2.7],[FM+3.42,FM+3.45,-3.3,-2.7],[FM+3.0,FM+3.45,-3.3,-3.27],[FM+3.0,FM+3.45,-2.73,-2.7]].forEach(r=>B(gm1,12.531,12.536,r[0],r[1],r[2],r[3],'#C3262B',true));
-{const rim=new THREE.Mesh(new THREE.TorusGeometry(.225,.012,8,32),mat('#D9480F'));rim.rotation.x=Math.PI/2;rim.position.set(12.91,FM+3.05,-3.0);gm1.add(rim);
- const net=new THREE.Mesh(new THREE.CylinderGeometry(.225,.15,.4,16,1,true),new THREE.MeshStandardMaterial({color:'#FFFFFF',transparent:true,opacity:.5,wireframe:true}));net.position.set(12.91,FM+2.85,-3.0);gm1.add(net);}
-[[11.9,17.7,-5.47,-5.43],[11.9,17.7,-.57,-.53],[17.68,17.72,-5.45,-.55]].forEach(r=>B(gm1,r[0],r[1],FM,FM+.004,r[2],r[3],'white',true));
-{const arc=new THREE.Mesh(new THREE.RingGeometry(1.78,1.82,40,1,-Math.PI/2,Math.PI),mat('white'));arc.rotation.x=-Math.PI/2;arc.position.set(17.7,FM+.004,-3.0);gm1.add(arc);}
+makeCar('MY',gm1,16.25,FM,3.0,Math.PI/2); makeCar('Z4',gm1,19.25,FM,3.0,Math.PI/2);   // Model Y e Z4 M40i alinhados com o portão (14,90–20,60), de marcha-atrás para sair a direito
+makeCar('iX2',OPT.ix2out,27.45,0,6.5,Math.PI/2);   // iX2 no lugar exterior à cota do piso 0, junto ao carregador AC
+gm1.add(OPT.ix2pat); makeCar('iX2',OPT.ix2pat,14.35,FM,-4.8,Math.PI);   // alternativa: iX2 no pátio, paralelo ao muro norte, de frente para a parede da escada (entra a direito vindo da rampa)
+// basquetebol: cesto na parede de suporte da escada exterior, virado ao pátio, desviado para norte (aro a ~2,4 m da linha do vidro do passadiço)
+{const cz=-3.9, BOARD=new THREE.MeshStandardMaterial({color:'#FFFFFF',transparent:true,opacity:.75});
+ B(gm1,11.95,12.5,FM+3.55,FM+3.65,cz-.05,cz+.05,'iron'); B(gm1,12.5,12.53,FM+2.9,FM+3.95,cz-.9,cz+.9,BOARD,true);
+ [[FM+3.0,FM+3.03,cz-.3,cz+.3],[FM+3.42,FM+3.45,cz-.3,cz+.3],[FM+3.0,FM+3.45,cz-.3,cz-.27],[FM+3.0,FM+3.45,cz+.27,cz+.3]].forEach(r=>B(gm1,12.531,12.536,r[0],r[1],r[2],r[3],'#C3262B',true));
+ const rim=new THREE.Mesh(new THREE.TorusGeometry(.225,.012,8,32),mat('#D9480F'));rim.rotation.x=Math.PI/2;rim.position.set(12.91,FM+3.05,cz);gm1.add(rim);
+ const net=new THREE.Mesh(new THREE.CylinderGeometry(.225,.15,.4,16,1,true),new THREE.MeshStandardMaterial({color:'#FFFFFF',transparent:true,opacity:.5,wireframe:true}));net.position.set(12.91,FM+2.85,cz);gm1.add(net);
+ // garrafa (4,4 m de largura) e semicírculo de lance livre
+ [[11.9,17.7,cz-2.22,cz-2.18],[11.9,17.7,cz+2.18,cz+2.22],[17.68,17.72,cz-2.2,cz+2.2]].forEach(r=>B(gm1,r[0],r[1],FM,FM+.004,r[2],r[3],'white',true));
+ const arc=new THREE.Mesh(new THREE.RingGeometry(1.78,1.82,40,1,-Math.PI/2,Math.PI),mat('white'));arc.rotation.x=-Math.PI/2;arc.position.set(17.7,FM+.004,cz);gm1.add(arc);}
 [15.35,18.35].forEach(x=>{B(gm1,x,x+.3,FM+1.0,FM+1.45,5.82,5.87,'white')});
 // faixa nascente da garagem (fora do alinhamento do portão): 4 bicicletas na parede norte, ao lado do portão (suportes rotativos, alturas desencontradas) + 4 estantes metálicas na parede nascente
 {const tm=mat('#1A1A1A');[21.0,21.45,21.9,22.35].forEach((x,i)=>{const dy=(i%2)*.3;B(gm1,x-.05,x+.05,FM+1.9+dy,FM+2.05+dy,.2,.35,'iron');
@@ -794,7 +810,8 @@ wallX(g1,-.2,-.1,12.1,F1,F1+1.0,'wallOut'); wallZ(g1,-.1,-.2,3.9,F1,F1+1.0,'wall
  const gd=(a,b,c,d)=>{const cx=(a+b)/2,cz=(c+d)/2,hx=Math.max((b-a)/2,.1),hz=Math.max((d-c)/2,.1);B(g,cx-hx,cx+hx,F1,F1+1.0,cz-hz,cz+hz,'wallOut');};   // rebordo/platibanda
  gd(12.1,22.85,-.22,-.18); gd(22.83,22.87,-.2,2.15); gd(22.85,24.9,2.13,2.17); gd(24.88,24.92,2.15,7.9); gd(12.1,24.9,7.88,7.92);
   // painéis fotovoltaicos a 35° virados a sul (alinhados com o edifício), 2 painéis na horizontal por fiada, espaçamento sem sombra ao meio-dia de inverno
- pvSouth(g,13.2,6,6.7,F1+.03); pvSouth(g,13.2,5,2.41,F1+.03);
+ // disposição do projecto: 2 fiadas ao alto (6 na fiada norte, 7 na fiada sul), a 35° virados a sul (fiada norte desviada para poente, por causa do vazio do pátio da suite)
+ pvRow(g,15.63,6,3.2,F1+.03,15); pvRow(g,16.4,7,7.0,F1+.03,15);
  // escada de serviço vertical (marinheiro) na parede norte do quarto do piso 1, a partir do terraço sobre a cozinha; topo curvo por cima do rebordo
  {const zr=.63,x0=4.6,x1=5.06,yb=F1+.04,yt=H1+.3;
   [x0,x1].forEach(x=>{B(g,x-.02,x+.02,yb,yt+.86,zr,zr+.04,'iron'); B(g,x-.02,x+.02,yt+.86,yt+.9,zr,1.2,'iron'); B(g,x-.02,x+.02,yt+.4,yt+.9,1.16,1.2,'iron');
@@ -855,7 +872,8 @@ B(gr,4.6,12.0,H1-.04,H1,3.95,7.75,'felt',true);
 B(gr,9.25,12.1,H0,F1,ZB,7.9,'wallOut');
 // cobertura do piso 1: rebordo de 0,4 m e painéis fotovoltaicos em fiadas nascente-poente a 10°
 {[[-.1,12.1,7.7,7.9],[-.2,0,3.9,7.8],[-.1,4.45,3.8,4.0],[5.11,12.1,.85,1.05],[4.35,4.55,.95,3.9],[12.0,12.2,.95,7.8]].forEach(r=>B(gr,r[0],r[1],H1+.3,H1+.7,r[2],r[3],'wallOut'));
- [0.4,4.1,7.8].forEach(x0=>pvTent(gr,x0,4.4,7.3,H1+.3)); [5.12,8.56].forEach(x0=>pvTent(gr,x0,1.2,3.6,H1+.3));}
+ // disposição do projecto: 2 colunas de 4 painéis deitados e 1 grupo de 2 junto ao rebordo poente, com inclinação baixa (10°) virados a poente
+ pvWest(gr,9.9,2.07,4,H1+.3,15); pvWest(gr,5.7,2.07,4,H1+.3,15); pvWest(gr,1.0,4.7,2,H1+.3,15);}   // cada fila equidistante das platibandas norte e sul do troço de cobertura onde assenta
 
 // ---------- Divisões ----------
 const ROOMS=[
@@ -899,7 +917,7 @@ const ROOMS=[
   luz:'Perfil LED no topo dos roupeiros; espelho retroiluminado no i.s.',
   sw:['oak','leather','stone','brass']},
  {id:'garagem',lvl:-1,name:'Garagem',area:'≈ 44 m² (59,20 m² com a mud room)',c:[18.5,FM+1.2,3.0],
-  mob:'Tesla Model Y (Juniper) e BMW iX2 lado a lado, alinhados com o portão e estacionados de marcha-atrás; 4 bicicletas na parede norte ao lado do portão e 4 estantes metálicas na parede nascente; dois carregadores de parede de 11 kW; bancada de arrumos junto à porta da escada. O pátio em frente tem cesto de basquetebol na parede de suporte da escada exterior e marcação de garrafa no pavimento.',
+  mob:'Tesla Model Y (Juniper) e BMW Z4 M40i lado a lado (o iX2 fica no lugar exterior, com carregador), alinhados com o portão e estacionados de marcha-atrás; 4 bicicletas na parede norte ao lado do portão e 4 estantes metálicas na parede nascente; dois carregadores de parede de 11 kW; bancada de arrumos junto à porta da escada. O pátio em frente tem cesto de basquetebol na parede de suporte da escada exterior, desviado para norte (longe do vidro do passadiço), e marcação de garrafa no pavimento.',
   mat:'Pavimento em betão afagado ou resina cinza; paredes pintadas a branco; portão seccionado a norte, com acesso pela rampa.',
   luz:'Calhas LED lineares no tecto, com sensor de presença.',
   nota:'O pé-direito livre é de 2,70 m sob a laje. Confirme a altura útil do portão seccionado com o fornecedor.',
@@ -977,7 +995,7 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 const lowBtn=document.getElementById('low');
 lowBtn.addEventListener('click',()=>{const on=lowBtn.getAttribute('aria-pressed')!=='true';lowBtn.setAttribute('aria-pressed',on);setLow(on)});
 const LV={pm1:-1,p0:0,p1:1};
-document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked;}};ap();cb.addEventListener('change',ap);});
+document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked; if(k==='ix2pat')OPT.ix2out.visible=!cb.checked;}};ap();cb.addEventListener('change',ap);});
 {const dS=document.getElementById('sunDay'),hS=document.getElementById('sunHr'),pB=document.getElementById('sunPlay');
  const today=()=>{const d=new Date();return Math.min(365,Math.max(1,SUN.doy(d.getMonth(),d.getDate())));};
  const apply=()=>SUN.set(+dS.value,+hS.value);
@@ -1008,7 +1026,7 @@ function select(id,fly){
 // rótulos
 const lblWrap=document.getElementById('labels');
 const L=ROOMS.map(r=>{const d=document.createElement('div');d.className='lbl';d.textContent=r.name;lblWrap.appendChild(d);return {r,d}});
-[['Piscina',-11.6,1.0,4.4],['Rampa da garagem',31.5,0.8,5],['Entrada pedonal',10.3,1.8,10.6],['Portão da garagem',31.5,2.2,11.0],['Horta',5.2,1.6,-3.8],['Pátio da garagem',17,-1.5,-3.5],['Lounge',-2.0,1.4,5.8,'lounge'],['Espreguiçadeiras',-5.9,1.0,4.6],['Deck',-3.7,0.6,3],['Lareira exterior',-3.6,1.4,-4.0],['Duche',-12.9,2.4,.8],['Oliveiras',-26.8,3.4,3.9],['Relvado de jogo',-12.2,.9,-4.0],['Casa das máquinas',-15,.6,-.2],['Compóstor de cozinha',4.7,1.5,-5.75],['Compostagem de jardim',-36.4,1.3,8.3],['Estacionamento exterior',27.4,1.4,6.5],['Cesto de basquetebol',12.6,1.6,-3.0],['Escada de serviço',4.83,5.6,.6],['Cinema',-3.4,2.9,7.5,'cinema'],['Sauna',-10.45,2.8,9.35,'sauna'],['Parque infantil',-21.5,3.2,8.0,'play'],['Árvores do canto',-35.2,3.8,9.2,'trees'],['Pinhal',-55,13,-25,'pines'],['Vivenda vizinha',45.5,7.6,3.5],['R. Dr. Francisco Salgado Zenha',20,.6,17],['R. Corredor Carlos Fabião',62,.6,40],['Moradias (lado oposto)',0,7.5,31]].forEach(([n,x,y,z,o])=>{const d=document.createElement('div');d.className='lbl';d.textContent=n;lblWrap.appendChild(d);L.push({r:{name:n,lvl:'site',c:[x,y,z],opt:o},d})});
+[['Piscina',-11.6,1.0,4.4],['Rampa da garagem',31.5,0.8,5],['Entrada pedonal',10.3,1.8,10.6],['Portão da garagem',31.5,2.2,11.0],['Horta',5.2,1.6,-3.8],['Pátio da garagem',17,-1.5,-3.5],['Lounge',-2.0,1.4,5.8,'lounge'],['Espreguiçadeiras',-5.9,1.0,4.6],['Deck',-3.7,0.6,3],['Lareira exterior',-3.6,1.4,-4.0],['Duche',-12.9,2.4,.8],['Oliveiras',-26.8,3.4,3.9],['Relvado de jogo',-12.2,.9,-4.0],['Casa das máquinas',-15,.6,-.2],['Compóstor de cozinha',4.7,1.5,-5.75],['Compostagem de jardim',-36.4,1.3,8.3],['Estacionamento exterior',27.4,1.4,6.5],['Cesto de basquetebol',12.6,1.4,-3.9],['Escada de serviço',4.83,5.6,.6],['Cinema',-3.4,2.9,7.5,'cinema'],['Sauna',-10.45,2.8,9.35,'sauna'],['Parque infantil',-21.5,3.2,8.0,'play'],['Árvores do canto',-35.2,3.8,9.2,'trees'],['Pinhal',-55,13,-25,'pines'],['Vivenda vizinha',45.5,7.6,3.5],['R. Dr. Francisco Salgado Zenha',20,.6,17],['R. Corredor Carlos Fabião',62,.6,40],['Moradias (lado oposto)',0,7.5,31]].forEach(([n,x,y,z,o])=>{const d=document.createElement('div');d.className='lbl';d.textContent=n;lblWrap.appendChild(d);L.push({r:{name:n,lvl:'site',c:[x,y,z],opt:o},d})});
 L.push({r:{name:'Vazio',lvl:1,c:[2.2,F1+.4,5.9]},d:(()=>{const d=document.createElement('div');d.className='lbl';d.textContent='Vazio para a sala';lblWrap.appendChild(d);return d})()});
 const v=new THREE.Vector3();
 function updLabels(){
