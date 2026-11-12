@@ -156,6 +156,7 @@ body.xrOn #opts{display:none}
   <label><input type="checkbox" data-k="pines" checked> Pinhal (desligado mantém as sombras)</label>
   <label><input type="checkbox" data-k="sauna" checked> Sauna exterior (2 pessoas)</label>
   <label><input type="checkbox" data-k="ix2pat"> iX2 no pátio da garagem (em vez do lugar exterior)</label>
+  <label><input type="checkbox" data-k="mudopen"> Mud room aberta para a garagem (proposta, sem divisória)</label>
   <label class="rng" style="grid-template-columns:5.2em 1fr">Muros do pátio <select id="wallSel" style="font:inherit;font-size:13px;padding:4px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)">
     <option value="">Como está</option><option value="combo">Revest. + trepadeiras + floreiras</option><option value="climb">Trepadeiras + floreiras</option><option value="vgarden">Jardim vertical</option><option value="clad">Ripado (revestimento)</option></select></label>
   <div class="sunbox"><b>Portões e caixilharia</b><div class="sunbtn"><button type="button" id="gGar" aria-pressed="false">Abrir garagem</button><button type="button" id="gEst" aria-pressed="false">Abrir lugar exterior</button><button type="button" id="vClose">Fechar tudo</button></div><small style="display:block;color:var(--muted);margin-top:4px;max-width:30em">Toque numa porta, janela ou portão no 3D. Garagem: correm as duas folhas; lugar exterior: só a dele. Janelas oscilobatentes: 1.º toque bascula, 2.º abre, 3.º fecha.</small></div>
@@ -331,7 +332,7 @@ const VSPEC=[
  {ax:'Z',c:22.85,a0:.45,a1:2.1,y0:0,t:'fixo',nome:'V05 · suite → pátio do duche (vidro fixo)'},
  {ax:'X',c:2.15,a0:23.0,a1:24.6,y0:0,t:'fixo',nome:'I.s. da suite: vidro fixo do duche para o pátio'},
  {ax:'Z',c:24.75,a0:6.2,a1:7.1,y0:0,t:'osc',n:1,in:-1,hinge:1,tiltOnly:true,nome:'V03 · vestuário, nascente: basculante de altura total'},
- {ax:'X',c:6.25,a0:13.92,a1:18.05,y0:0,t:'fixo',nome:'V02 · corredor ↔ pátio (fixo)'},
+ {ax:'X',c:6.25,a0:13.92,a1:17.89,y0:0,t:'fixo',nome:'V02 · corredor ↔ pátio (fixo; acaba na parede do fundo, onde desce o TQ2)'},
  {ax:'X',c:7.8,a0:4.7,a1:9.0,y0:F1+.8,t:'fixo',nome:'V17 · janela do escritório: faixa fixa a meia altura (0,80–1,70 m)'},
  {ax:'Z',c:12.1,a0:7.1,a1:7.72,y0:F1,t:'osc',n:1,in:-1,hinge:0,tiltOnly:true,nome:'V08 · escritório, sudeste: basculante de altura total'},
  {ax:'X',c:.95,a0:9.35,a1:9.85,y0:F1+1.4,t:'osc',n:1,in:1,hinge:1,nome:'Janela do i.s. do piso 1'},
@@ -445,6 +446,23 @@ function sectional(g,x0,x1,y0,H,zf){const n=5,h=H/n,r=.2,arc=Math.PI*r/2,AN=mat(
       if(t<=H){y=y0+t;z=zf;a=0;} else if(t<=H+arc){a=(t-H)/r;y=y0+H+r*Math.sin(a);z=zf+r-r*Math.cos(a);} else {a=Math.PI/2;y=y0+H+r;z=zf+r+(t-H-arc);}
       pg.position.set(0,y,z); pg.rotation.x=a;});};
   L.o.place(0); VAO.leaves.push(L); VAO.sect=L; return L;}
+// proposta (opção): mud room aberta para a garagem, sem divisória — OPT.mudwall (divisória, cacifo e nicho nela) / OPT.mudopen (alternativa)
+OPT.mudwall=new THREE.Group(); OPT.mudopen=new THREE.Group(); OPT.mudopen.visible=false; G.pm1.add(OPT.mudwall,OPT.mudopen);
+const NETM=new THREE.MeshStandardMaterial({color:'#262626',transparent:true,opacity:.45,roughness:.9,side:THREE.DoubleSide});
+function mudOpen(){const g=OPT.mudopen;
+  // 5.º cacifo e nicho das bolas passam para a parede sul (à direita de quem entra pela P07), em frente ao lugar onde estava o tanque
+  const lockS=(x0,c)=>{B(g,x0,x0+.02,FM,FM+2.1,5.3,5.88,'oak'); B(g,x0+.58,x0+.6,FM,FM+2.1,5.3,5.88,'oak'); B(g,x0,x0+.6,FM+2.1,FM+2.15,5.3,5.88,'oak');
+    B(g,x0+.02,x0+.58,FM+.45,FM+.5,5.32,5.86,'oak'); B(g,x0+.02,x0+.58,FM+1.75,FM+1.78,5.32,5.86,'oak'); B(g,x0+.25,x0+.35,FM+1.35,FM+1.45,5.8,5.86,'iron');
+    B(g,x0+.08,x0+.52,FM+1.8,FM+2.0,5.36,5.84,'linen'); B(g,x0+.06,x0+.54,FM+.05,FM+.18,5.4,5.82,c,true);};
+  lockS(13.0,'#3A3A3A');
+  B(g,13.6,13.62,FM,FM+2.1,5.3,5.88,'oak'); B(g,14.2,14.22,FM,FM+2.1,5.3,5.88,'oak'); B(g,13.6,14.22,FM+2.1,FM+2.15,5.3,5.88,'oak');
+  [FM+.55,FM+1.15,FM+1.75].forEach(y=>B(g,13.62,14.2,y,y+.02,5.32,5.88,'oak')); [[FM+.12,'#D9480F'],[FM+.69,'#FFFFFF'],[FM+1.29,'#3A3A3A']].forEach(([y,c])=>ball(g,13.91,y,5.62,.12,c));
+  // limite da zona: faixa no pavimento (o grés da mud room e o EVA do treino acabam em x 14,50) e batentes de rodas para o Model Y
+  B(g,14.47,14.53,FM+.012,FM+.015,.2,5.88,'#C9A43A',true); [[15.45,15.95],[16.55,17.05]].forEach(([a,b])=>B(g,a,b,FM,FM+.1,4.86,5.02,'#E3B04B'));
+  // rede de desporto retráctil num carril de tecto (fechada quando se usa a zona de treino; aberta fica recolhida junto à janela)
+  B(g,14.53,14.57,-.44,-.4,.2,3.0,'iron',true); B(g,14.5,14.6,FM+.08,-.44,.22,.5,NETM);
+  for(let z=.62;z<2.9;z+=.4) B(g,14.548,14.552,-.44,-.4,z,z+.03,'iron',true);}
+mudOpen();
 
 // ---------- Terreno (com recorte para a cave e o pátio da garagem) ----------
 // ---------- Lote (implantação 1:200; norte real a 29° no sentido horário do topo da planta) ----------
@@ -723,22 +741,22 @@ gm1.add(OPT.ix2pat); makeCar('iX2',OPT.ix2pat,14.35,FM,-4.8,Math.PI);   // alter
    [.13,.58,1.03,1.48].forEach((h,k)=>{B(gm1,22.05,22.48,FM+h,FM+h+.3,z0+.08,z0+.55,['#C9CCCE','#7FA36B','#5D7FA6','#C8B48F'][k],true);B(gm1,22.05,22.48,FM+h,FM+h+.3,z0+.62,z1-.08,['#C8B48F','#C9CCCE','#E3B04B','#7FA36B'][k],true);});});}
 // mud room (≈ 13 m², divisória recuada para os carros ficarem alinhados com o portão): metade norte da divisória em vidro (luz da janela alta), metade sul em pladur com cacifos; zona de treino junto à janela
 B(gm1,12.2,14.45,FM,FM+.012,.2,5.88,'stoneDark',true);
-wallZ(gm1,14.5,.2,3.0,FM,FM+.9,'wall',.1); glassZ(gm1,14.5,.2,3.0,FM+.9,-.3,FM);
-wallZ(gm1,14.5,3.0,4.5,FM,-.3,'wall',.1); wallZ(gm1,14.5,5.4,5.88,FM,-.3,'wall',.1);
-reg(B(gm1,14.48,14.52,FM,FM+2.1,4.5,5.4,glass,true),FM,FM+2.1); wallZ(gm1,14.5,4.5,5.4,FM+2.1,-.3,'wall',.1); WALLS[WALLS.length-1].base=FM;
+wallZ(OPT.mudwall,14.5,.2,3.0,FM,FM+.9,'wall',.1); glassZ(OPT.mudwall,14.5,.2,3.0,FM+.9,-.3,FM);
+wallZ(OPT.mudwall,14.5,3.0,4.5,FM,-.3,'wall',.1); wallZ(OPT.mudwall,14.5,5.4,5.88,FM,-.3,'wall',.1);
+reg(B(OPT.mudwall,14.48,14.52,FM,FM+2.1,4.5,5.4,glass,true),FM,FM+2.1); wallZ(OPT.mudwall,14.5,4.5,5.4,FM+2.1,-.3,'wall',.1); WALLS[WALLS.length-1].base=FM;
 {const COLS=['#5D7FA6','#E3B04B','#7FA36B','#C3262B','#3A3A3A','#B9965F'];
- const locker=(xb,xf,z0,c)=>{const s=Math.sign(xf-xb),xi=xb+s*.05,xo=xf-s*.05,x0=Math.min(xb,xf),x1=Math.max(xb,xf);
-   B(gm1,x0,x1,FM,FM+2.1,z0,z0+.02,'oak'); B(gm1,Math.min(xi,xo),Math.max(xi,xo),FM+.45,FM+.5,z0+.02,z0+.6,'oak'); B(gm1,Math.min(xi,xo),Math.max(xi,xo),FM+1.75,FM+1.78,z0+.02,z0+.6,'oak');
-   B(gm1,Math.min(xb+s*.02,xb+s*.1),Math.max(xb+s*.02,xb+s*.1),FM+1.35,FM+1.45,z0+.25,z0+.35,'iron'); B(gm1,Math.min(xi,xo-s*.05),Math.max(xi,xo-s*.05),FM+1.8,FM+2.0,z0+.1,z0+.52,'linen');
-   B(gm1,Math.min(xi,xo),Math.max(xi,xo),FM+.05,FM+.18,z0+.08,z0+.54,c,true);};
+ const locker=(xb,xf,z0,c,G=gm1)=>{const s=Math.sign(xf-xb),xi=xb+s*.05,xo=xf-s*.05,x0=Math.min(xb,xf),x1=Math.max(xb,xf);
+   B(G,x0,x1,FM,FM+2.1,z0,z0+.02,'oak'); B(G,Math.min(xi,xo),Math.max(xi,xo),FM+.45,FM+.5,z0+.02,z0+.6,'oak'); B(G,Math.min(xi,xo),Math.max(xi,xo),FM+1.75,FM+1.78,z0+.02,z0+.6,'oak');
+   B(G,Math.min(xb+s*.02,xb+s*.1),Math.max(xb+s*.02,xb+s*.1),FM+1.35,FM+1.45,z0+.25,z0+.35,'iron'); B(G,Math.min(xi,xo-s*.05),Math.max(xi,xo-s*.05),FM+1.8,FM+2.0,z0+.1,z0+.52,'linen');
+   B(G,Math.min(xi,xo),Math.max(xi,xo),FM+.05,FM+.18,z0+.08,z0+.54,c,true);};
  for(let i=0;i<4;i++) locker(12.2,12.7,2.32+i*.62,COLS[i]);
  B(gm1,12.2,12.7,FM,FM+2.1,4.8,4.82,'oak'); B(gm1,12.2,12.7,FM+2.1,FM+2.15,2.32,4.82,'oak');
- locker(14.45,13.95,3.72,COLS[4]);
- B(gm1,13.95,14.45,FM,FM+2.1,4.34,4.36,'oak'); B(gm1,13.95,14.45,FM+2.1,FM+2.15,3.1,4.36,'oak');
+ const MW=OPT.mudwall; locker(14.45,13.95,3.72,COLS[4],MW);
+ B(MW,13.95,14.45,FM,FM+2.1,4.34,4.36,'oak'); B(MW,13.95,14.45,FM+2.1,FM+2.15,3.1,4.36,'oak');
  // nicho aberto para bolas e capacetes
- B(gm1,14.4,14.45,FM,FM+2.1,3.12,3.72,'oak'); B(gm1,13.95,14.45,FM,FM+2.1,3.1,3.12,'oak');
- [FM+.55,FM+1.15,FM+1.75].forEach(y=>B(gm1,13.95,14.4,y,y+.02,3.12,3.72,'oak'));
- [[FM+.12,'#D9480F'],[FM+.69,'#FFFFFF'],[FM+1.29,'#3A3A3A']].forEach(([y,c])=>ball(gm1,14.17,y,3.42,.12,c));}
+ B(MW,14.4,14.45,FM,FM+2.1,3.12,3.72,'oak'); B(MW,13.95,14.45,FM,FM+2.1,3.1,3.12,'oak');
+ [FM+.55,FM+1.15,FM+1.75].forEach(y=>B(MW,13.95,14.4,y,y+.02,3.12,3.72,'oak'));
+ [[FM+.12,'#D9480F'],[FM+.69,'#FFFFFF'],[FM+1.29,'#3A3A3A']].forEach(([y,c])=>ball(MW,14.17,y,3.42,.12,c));}
 // espaldar de madeira (≈ 0,85 × 2,25 m) com barra de elevações, na parede poente
 B(gm1,12.22,12.32,FM,FM+2.25,1.3,1.37,'pine'); B(gm1,12.22,12.32,FM,FM+2.25,2.08,2.15,'pine');
 for(let y=FM+.15;y<FM+2.1;y+=.16) B(gm1,12.24,12.3,y,y+.035,1.37,2.08,'pine');
@@ -931,7 +949,7 @@ skX(g0,2.0,-1,22.85,23.0,0,H0,'darkRender'); skX(g0,2.0,-1,23.0,24.6,2.4,H0,'dar
 skX(g0,6.30,1,9.25,9.6,0,H0,'ribbed'); skX(g0,6.30,1,10.67,13.92,0,H0,'ribbed'); skX(g0,6.30,1,9.6,10.67,2.4,H0,'ribbed');
 skX(g0,1.20,-1,10.18,12.1,0,H0,'ribbed');
 wallX(g0,6.25,9.25,9.6,0,H0,'wallOut',.1); vDoor(g0,{ax:'X',c:6.25,a0:9.6,a1:10.67,y0:0,y1:2.4,in:-1,hinge:0,m:mat('oakDark'),th:.06,nome:'Porta de entrada (abre para poente)'}); wallX(g0,6.25,10.67,13.92,0,H0,'wallOut',.1); // porta de entrada
-glassX(g0,6.25,13.92,18.05,0,H0);                             // corredor → pátio (V02)
+glassX(g0,6.25,13.92,17.89,0,H0); wallX(g0,6.25,17.89,18.05,0,H0,'wallOut',.1);                             // corredor → pátio (V02)
 // --- interiores ---
 wallZ(g0,7.81,.17,.8,0,H0);                                   // remate bancada | lavandaria
 B(g0,7.85,8.5,0,2.4,1.65,4.1,'noce');
@@ -969,16 +987,16 @@ cyl(g0,8.56,3.02,.012,1.0,1.03,'iron'); B(g0,8.56,8.7,1.0,1.02,3.01,3.03,'iron')
 B(g0,10.1,10.16,1.1,1.12,3.3,3.7,'iron'); B(g0,10.05,10.12,.7,1.1,3.35,3.65,'linen');   // toalheiro e toalha
 B(g0,8.56,8.58,2.2,2.24,2.5,4.05,new THREE.MeshStandardMaterial({color:'#FFE9C2',emissive:'#FFD9A0',emissiveIntensity:.7}),true); // fita LED indirecta junto ao tecto
 // quartos
-wallX(g0,4.9,12.1,13.97,0,H0,'wall',.15); wallX(g0,4.9,14.84,15.08,0,H0,'wall',.15); wallX(g0,4.9,16.92,17.08,0,H0,'wall',.15); wallX(g0,4.9,18.0,19.9,0,H0,'wall',.15);
-// corredor dos quartos: parede em madeira escura do chão ao tecto entre x 13,97 e 18,00 — as portas dos quartos ficam dissimuladas (a madeira continua por cima da aduela)
+wallX(g0,4.9,12.1,13.97,0,H0,'wall',.15); wallX(g0,4.9,14.84,15.08,0,H0,'wall',.15); wallX(g0,4.9,16.92,17.08,0,H0,'wall',.15); wallX(g0,4.9,17.88,19.9,0,H0,'wall',.15);
+// corredor dos quartos: parede em madeira escura do chão ao tecto entre x 13,97 e 17,89 (acaba na face da parede do fundo, engrossada para o TQ2) — as portas dos quartos ficam dissimuladas (a madeira continua por cima da aduela)
 // e, entre elas, na parede sul do i.s. comum virada ao corredor, o armário de visitas (casacos e sapatos) com duas portas à face
 {const DW=mat('darkWood'),ZF=4.995,ZB=4.975,GP=(x0,x1,y0,y1)=>reg(B(g0,x0,x1,y0,y1,ZF,ZF+.002,GAPM,true),y0,y1,0);
- [[13.97,14.84],[15.08,16.92],[17.08,18.0]].forEach(([a,b])=>{reg(B(g0,a,b,2.1,H0,4.825,ZB,'wall'),2.1,H0,0); reg(B(g0,a,b,2.1,H0,ZB,ZF,DW),2.1,H0,0); B(g0,a,b,2.1,2.115,4.825,ZB,DW,true); GP(a,b,2.098,2.104);});
+ [[13.97,14.84],[15.08,16.92],[17.08,17.88]].forEach(([a,b])=>{reg(B(g0,a,b,2.1,H0,4.825,ZB,'wall'),2.1,H0,0); reg(B(g0,a,b,2.1,H0,ZB,ZF,DW),2.1,H0,0); B(g0,a,b,2.1,2.115,4.825,ZB,DW,true); GP(a,b,2.098,2.104);});
  [[14.84,15.08],[16.92,17.08]].forEach(([a,b])=>reg(B(g0,a,b,0,H0,ZB,ZF,DW),0,H0,0));
- [[13.95,13.97],[14.84,14.86],[17.06,17.08],[18.0,18.02]].forEach(([a,b])=>reg(B(g0,a,b,0,2.1,4.825,ZB,DW),0,2.1,0));   // aduelas em madeira escura
- [13.97,14.84,15.08,16.0,16.92,17.08,18.0].forEach(x=>GP(x-.002,x+.002,0,2.1));
+ [[13.95,13.97],[14.84,14.86],[17.06,17.08],[17.88,17.89]].forEach(([a,b])=>reg(B(g0,a,b,0,2.1,4.825,ZB,DW),0,2.1,0));   // aduelas em madeira escura
+ [13.97,14.84,15.08,16.0,16.92,17.08,17.88].forEach(x=>GP(x-.002,x+.002,0,2.1));
  vDoor(g0,{ax:'X',c:4.9,a0:13.97,a1:14.84,y0:0,y1:2.1,in:-1,hinge:0,d:.075,m:DW,th:.04,pull:'flush',nome:'Porta do quarto 1 (dissimulada)'});
- vDoor(g0,{ax:'X',c:4.9,a0:17.08,a1:18.0,y0:0,y1:2.1,in:-1,hinge:1,d:.075,m:DW,th:.04,pull:'flush',nome:'Porta do quarto 2 (dissimulada)'});
+ vDoor(g0,{ax:'X',c:4.9,a0:17.08,a1:17.88,y0:0,y1:2.1,in:-1,hinge:1,d:.075,m:DW,th:.04,pull:'flush',nome:'Porta do quarto 2 (dissimulada)'});
  vDoor(g0,{ax:'X',c:4.9,a0:15.08,a1:16.0,y0:0,y1:2.1,in:1,hinge:0,d:.085,m:DW,th:.02,pull:'flush',nome:'Armário de visitas · porta esquerda'});
  vDoor(g0,{ax:'X',c:4.9,a0:16.0,a1:16.92,y0:0,y1:2.1,in:1,hinge:1,d:.085,m:DW,th:.02,pull:'flush',nome:'Armário de visitas · porta direita'});
  B(g0,15.08,16.92,1.98,2.0,4.34,4.94,'white'); B(g0,15.1,16.9,1.76,1.785,4.6,4.625,'steel'); [.12,.38].forEach(y=>B(g0,15.08,16.92,y,y+.02,4.36,4.92,'white'));   // prateleira de topo, varão, sapateiras
@@ -989,6 +1007,8 @@ wallX(g0,4.3,15.07,16.93,0,H0,'wall',.08);                     // armário do i.
 wallZ(g0,19.9,.45,4.9,0,H0,'wall',.15);
 // entrada da suite (planta 05): parede no topo nascente do corredor, porta de 0,80 m a abrir para dentro da suite com dobradiças a norte (P01, lacada a branco)
 wallZ(g0,18.12,4.975,5.05,0,H0,'wall',.16); wallZ(g0,18.12,5.85,6.2,0,H0,'wall',.16); reg(B(g0,18.04,18.2,2.1,H0,5.05,5.85,'wall'),2.1,H0,0);
+// a parede do fundo do corredor engrossa 15 cm para poente (x 17,89–18,04): o tubo de queda TQ2 (Ø110) desce lá dentro, junto ao pilar da suite; o V02 e a madeira acabam nessa face
+reg(B(g0,17.89,18.04,0,H0,4.975,5.05,'wall'),0,H0,0); reg(B(g0,17.89,18.04,0,H0,5.85,6.2,'wall'),0,H0,0); reg(B(g0,17.89,18.04,2.1,H0,5.05,5.85,'wall'),2.1,H0,0);
 vDoor(g0,{ax:'Z',c:18.12,a0:5.07,a1:5.83,y0:0,y1:2.08,in:1,hinge:0,m:mat('whiteLac'),th:.045,aro:mat('whiteLac'),ad:.085,nome:'Porta da suite (P01, lacada a branco)'});                         // quarto 2 | suite
 // i.s. suite
 wallZ(g0,22.86,2.15,4.2,0,H0,'wall',.15);
@@ -1269,7 +1289,7 @@ const ROOMS=[
   nota:'Fica coberto pela laje do terraço do piso 1, por isso a pérgola deixa de ser necessária a norte.',
   sw:['stone','cane','terra','iron']},
  {id:'hall',lvl:0,name:'Hall e entrada',area:'5,81 m² + corredor',c:[12.6,1.2,5.4],
-  mob:'Sem móvel solto na entrada: à esquerda de quem entra, a parede-ressalto que esconde a sala tem um móvel encastrado em madeira, com portas à face e sem puxadores, para pequenas arrumações e para esconder o QE e o ATI. A porta de entrada abre para poente (dobradiças do lado da parede-ressalto). Tapete de corredor em sisal. No corredor dos quartos, parede em madeira escura do chão ao tecto: as portas dos dois quartos ficam dissimuladas (a madeira continua por cima da aduela) e, entre elas, na parede do i.s. comum, o armário de visitas para casacos e sapatos.',
+  mob:'Sem móvel solto na entrada: à esquerda de quem entra, a parede-ressalto que esconde a sala tem um móvel encastrado em madeira, com portas à face e sem puxadores, para pequenas arrumações e para esconder o QE e o ATI. A porta de entrada abre para poente (dobradiças do lado da parede-ressalto). Tapete de corredor em sisal. No corredor dos quartos, parede em madeira escura do chão ao tecto: as portas dos dois quartos ficam dissimuladas (a madeira continua por cima da aduela) e, entre elas, na parede do i.s. comum, o armário de visitas para casacos e sapatos. O corredor acaba numa parede engrossada 15 cm, onde desce o tubo de queda TQ2 (junto ao pilar da suite); o vidro V02 e a madeira acabam ambos nessa face (x 17,89), e a porta do quarto 2 fica com 0,80 m.',
   mat:'Soalho flutuante cinza claro contínuo; móvel encastrado e porta de entrada em madeira escura; a face sul do bloco da cozinha e do i.s. social, virada ao hall e à sala, é em folheado de nogueira como as colunas da cozinha, com a porta do i.s. social dissimulada; parede a nascente em reboco com textura de cal.',
   luz:'Downlights embutidos de feixe estreito; aplique sobre a consola.',
   nota:'O V02 a sul (pátio) precisa da pala de ~1,2 m que já falámos.',
@@ -1716,7 +1736,7 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 const lowBtn=document.getElementById('low');
 lowBtn.addEventListener('click',()=>{const on=lowBtn.getAttribute('aria-pressed')!=='true';lowBtn.setAttribute('aria-pressed',on);setLow(on)});
 const LV={pm1:-1,p0:0,p1:1};
-document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked; if(k==='ix2pat')OPT.ix2out.visible=!cb.checked;}};ap();cb.addEventListener('change',ap);});
+document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked; if(k==='ix2pat')OPT.ix2out.visible=!cb.checked; if(k==='mudopen')OPT.mudwall.visible=!cb.checked;}};ap();cb.addEventListener('change',ap);});
 {const dS=document.getElementById('sunDay'),hS=document.getElementById('sunHr'),pB=document.getElementById('sunPlay');
  const today=()=>{const d=new Date();return Math.min(365,Math.max(1,SUN.doy(d.getMonth(),d.getDate())));};
  const apply=()=>SUN.set(+dS.value,+hS.value);
