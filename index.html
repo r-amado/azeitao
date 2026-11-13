@@ -117,6 +117,7 @@ body.panoOn header,body.panoOn #sheet,body.panoOn #opts,body.panoOn #labels,body
 /* Raio-X de redes */
 #xleg{top:calc(env(safe-area-inset-top,0px) + 124px);bottom:auto;max-height:calc(100vh - 150px);overflow:auto;max-width:min(300px,72vw)}
 #xleg summary{cursor:pointer;font-size:12px;color:var(--muted);margin-top:6px}
+#xlinks{display:block;user-select:all;word-break:break-all;margin-top:4px;font-size:11.5px;color:var(--muted)}
 body.xrOn #opts{display:none}
 #xleg .xh small{display:inline;margin-left:6px}
 #xleg .xrow{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 2px;padding:0}
@@ -143,7 +144,7 @@ body.xrOn #opts{display:none}
   <div class="whint" id="whint">Joystick ou W A S D para andar · arraste para olhar · duplo toque no chão para saltar para lá · Shift corre · toque numa porta, janela ou portão para abrir</div>
   <div class="wcross" aria-hidden="true"></div>
 </div>
-<div id="xleg" hidden><div class="xh"><b>Raio-X · redes</b><small id="xst">a carregar os dados…</small></div><div class="xrow" id="xfloor" role="group" aria-label="Piso"></div><details id="xlegd" open><summary>Redes e camadas</summary><div id="xlays"></div><div class="xt">Mostrar</div><div class="xrow" id="xshow"></div><label>Paredes <input type="range" id="xop" min="0" max="60" value="6" aria-label="Opacidade das paredes no raio-X"><span id="xopv">6 %</span></label><small>Proposta R01 (11/11/2026), a validar pelo projectista, Grupo HAB e INDIRE. Toque num cabo, parede, laje, courette, esteira ou dispositivo.</small></details></div>
+<div id="xleg" hidden><div class="xh"><b>Raio-X · redes</b><small id="xst">a carregar os dados…</small></div><div class="xrow" id="xfloor" role="group" aria-label="Piso"></div><details id="xlegd" open><summary>Redes e camadas</summary><div id="xlays"></div><div class="xt">Mostrar</div><div class="xrow" id="xshow"></div><label>Paredes <input type="range" id="xop" min="0" max="60" value="6" aria-label="Opacidade das paredes no raio-X"><span id="xopv">6 %</span></label><div class="xrow"><button type="button" id="xlinkb" title="Escreve esta vista no endereço da página (#raiox-…) e copia-a">Copiar link desta vista</button></div><small id="xlinks" hidden></small><small>Proposta R01 (11/11/2026), a validar pelo projectista, Grupo HAB e INDIRE. Toque num cabo, parede, laje, courette, esteira ou dispositivo.</small></details></div>
 <div id="pano" hidden><div class="pbar"><b id="panoT"></b><span id="panoSel"></span><button id="panoX" type="button">✕ Voltar ao 3D</button></div><div id="panoMsg"></div><div class="phint">Arraste para olhar à volta · dois dedos ou roda para aproximar</div></div>
 <div id="compass" aria-label="Norte"><i></i>N</div>
 <details id="opts"><summary>Opções</summary>
@@ -159,6 +160,7 @@ body.xrOn #opts{display:none}
   <label><input type="checkbox" data-k="mudopen"> Mud room aberta para a garagem (proposta, sem divisória)</label>
   <label><input type="checkbox" data-k="seg" checked> Segurança Ajax: detectores, câmaras e sirenes</label>
   <label><input type="checkbox" data-k="cov"> Cobertura das câmaras (zonas vistas e sem câmara)</label>
+  <label><input type="checkbox" data-k="wifi" checked> Rede Wi-Fi: 6 Deco TP-Link (2 X55, 2 X50-PoE, 2 X50-Outdoor)</label>
   <label class="rng" style="grid-template-columns:5.2em 1fr">Muros do pátio <select id="wallSel" style="font:inherit;font-size:13px;padding:4px;border-radius:8px;border:1px solid var(--line);background:var(--chip);color:var(--ink)">
     <option value="">Como está</option><option value="combo">Revest. + trepadeiras + floreiras</option><option value="climb">Trepadeiras + floreiras</option><option value="vgarden">Jardim vertical</option><option value="clad">Ripado (revestimento)</option></select></label>
   <div class="sunbox"><b>Portões e caixilharia</b><div class="sunbtn"><button type="button" id="gGar" aria-pressed="false">Abrir garagem</button><button type="button" id="gEst" aria-pressed="false">Abrir lugar exterior</button><button type="button" id="vClose">Fechar tudo</button></div><small style="display:block;color:var(--muted);margin-top:4px;max-width:30em">Toque numa porta, janela ou portão no 3D. Garagem: correm as duas folhas; lugar exterior: só a dele. Janelas oscilobatentes: 1.º toque bascula, 2.º abre, 3.º fecha.</small></div>
@@ -632,6 +634,41 @@ function covSet(on){COV.on=on; let lg=document.getElementById('covleg');
 #covleg b{font-weight:600}#covleg em{font-style:normal;color:var(--muted);font-size:11.5px}#covleg p{margin:7px 0 0;color:var(--muted);font-size:11.5px}
 #covlabs{position:fixed;left:0;top:0;pointer-events:none;z-index:25}.covlab{position:fixed;left:0;top:0;background:#1E241F;color:#fff;font-size:11px;padding:2px 6px;border-radius:6px;white-space:nowrap}`; document.head.appendChild(css);}
 
+// ================= v138: rede Wi-Fi — os 6 Deco TP-Link no 3D (dispositivos «ponto de acesso Wi-Fi» de redes.json) =================
+// Medidas das fichas TP-Link: X50-PoE 154 × 154 × 68,6 mm (tecto), X55 110 × 110 × 114 mm (em cima de um móvel), X50-Outdoor 110 × 121,3 × 215,5 mm (parede).
+// Encaixe como na segurança: procura a superfície na direcção contrária à face; o da garagem fica fixo por baixo da esteira. Opção «Rede Wi-Fi».
+OPT.wifi=new THREE.Group();   // interruptor das opções (os Deco vão para um grupo por piso)
+const WIFG={'-1':new THREE.Group(),'0':new THREE.Group(),'1':new THREE.Group()}; G.pm1.add(WIFG['-1']); G.p0.add(WIFG['0']); G.p1.add(WIFG['1']);
+const WIFW=new THREE.MeshStandardMaterial({color:'#F4F4F1',roughness:.35,metalness:0});
+const WIFT=new THREE.MeshStandardMaterial({color:'#D6D6D2',roughness:.5,metalness:0});
+const WIFL=new THREE.MeshStandardMaterial({color:'#2FD6C4',emissive:'#2FD6C4',emissiveIntensity:.9,roughness:.4});
+function wifiShape(d){const g=new THREE.Group(), m=d.modelo||''; let h=.11;
+  if(m==='Deco X50-PoE'){segBox(g,.154,.154,.042,WIFW); const c=new THREE.Mesh(new THREE.CylinderGeometry(.06,.072,.026,32),WIFW); c.rotation.x=Math.PI/2; c.position.z=.055; c.castShadow=true; g.add(c);
+    segCyl(g,.006,.002,WIFL,0,0,.068); h=.154;}
+  else if(m==='Deco X55'){segBox(g,.11,.11,.104,WIFW); segBox(g,.104,.104,.01,WIFT,0,0,.104); segCyl(g,.005,.002,WIFL,0,.042,.114); h=.114;}
+  else if(m==='Deco X50-Outdoor'){segBox(g,.11,.2155,.121,WIFW); segBox(g,.06,.008,.003,WIFT,0,.075,.121); segCyl(g,.005,.002,WIFL,0,-.085,.121);
+    segBox(g,.03,.04,.03,WIFT,0,-.125,.045); h=.2155;}
+  else return null;
+  g.userData.h=h; return g;}
+function wifiBuild(D){
+  const devs=(D.dispositivos||[]).filter(d=>d.tipo==='ponto de acesso Wi-Fi'); if(!devs.length) return;
+  const rc=new THREE.Raycaster(), tg=[G.pm1,G.p0,G.p1,G.extra,G.roof], skip=new Set([...Object.values(SEGG),...Object.values(WIFG)]);
+  const vis=o=>{for(let p=o;p;p=p.parent){if(!p.visible&&p!==XR.g) return false; if(skip.has(p)||p===XR.g) return false;} return true;};
+  const ok=h=>{const o=h.object, mt=o.userData.m0||o.material; if(!o.isMesh||Array.isArray(mt)) return false; if(mt===INVIS||mt.visible===false||mt.colorWrite===false) return false;
+    if(mt.transparent&&mt.opacity<.95) return false; return vis(o);};
+  devs.forEach(d=>{const g=wifiShape(d); if(!g) return; const n=new THREE.Vector3(...(SEGN[d.face]||SEGN.D)), p=new THREE.Vector3(...d.pos);
+    let at=p.clone(), hit=null;
+    if(!d.fixo){rc.set(p.clone().addScaledVector(n,.35),n.clone().negate()); rc.far=1.0; hit=rc.intersectObjects(tg,true).find(ok); if(hit) at=hit.point.clone().addScaledVector(n,.002);}
+    g.position.copy(at); g.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);
+    g.userData.wifi=d.id; g.userData.hit=hit?(hit.object.name||hit.object.material&&hit.object.material.name||'sup'):(d.fixo?'fixo':null); g.traverse(o=>{if(o.isMesh){o.userData.seg=d.id; o.userData.wifi=d.id;}});
+    const lvl=String(d.g3d!=null?d.g3d:d.piso), grp=WIFG[lvl]||WIFG['0']; grp.add(g);
+    const base=lvl==='-1'?FM:lvl==='1'?F1:0, top=at.y+(Math.abs(n.y)>.5?0:g.userData.h/2);
+    SEGL.push({g,base,top});});
+  window.__wifi=WIFG;
+  if(typeof setMode==='function'&&typeof mode!=='undefined') setMode(mode);
+  if(document.getElementById('low')&&document.getElementById('low').getAttribute('aria-pressed')==='true') segLow(true);
+}
+
 // ---------- Terreno (com recorte para a cave e o pátio da garagem) ----------
 // ---------- Lote (implantação 1:200; norte real a 29° no sentido horário do topo da planta) ----------
 function poly(g,pts,y,m,holes){const sh=new THREE.Shape();pts.forEach((p,i)=>i?sh.lineTo(p[0],-p[1]):sh.moveTo(p[0],-p[1]));
@@ -831,8 +868,8 @@ cyl(G.extra,28.2,.6,.12,0,1.4,'oakDark'); ball(G.extra,28.2,1.9,.6,.8,'plant');
   [[0,2.2,0,1.3],[.7,2.0,.4,.9],[-.6,2.1,-.3,.95],[.2,2.7,-.2,.8]].forEach(([dx,y,dz,r])=>{const b=ball(G.extra,x+dx,y,z+dz,r,'oliveLeaf');b.scale.y=.7;});});
 // horta elevada junto à porta de serviço da lavandaria e à escada exterior: 4 canteiros norte-sul 1,0 x 2,6 m
 B(G.extra,0.4,10.25,-.03,.01,-5.3,-1.46,'gravel',true);
-B(G.extra,10.35,11.9,-.05,.02,-1.6,-.25,'stone');
-wallZ(G.extra,10.35,-6.1,-1.6,0,1.0,'wallOut',.2); wallZ(G.extra,11.9,-5.4,-.25,0,1.0,'wallOut',.2);
+B(G.extra,10.35,12.04,-.05,.02,-1.6,-.25,'stone');   // patamar da escada exterior, encostado ao passadiço (v136)
+wallZ(G.extra,10.35,-6.1,-1.6,0,1.0,'wallOut',.2); wallZ(G.extra,11.9,-5.4,-1.5,0,1.0,'wallOut',.2);   // v136: só ao longo do lanço; junto ao patamar estava a mais
 [0.7,2.3,3.9,5.5,7.1,8.7].forEach(x0=>{const x1=x0+1.0,z0=-5.1,z1=-2.5;
   B(G.extra,x0,x1,0,.67,z0,z1,'wallOut');B(G.extra,x0-.05,x1+.05,.67,.72,z0-.05,z1+.05,'stone');B(G.extra,x0+.12,x1-.12,.6,.68,z0+.12,z1-.12,'earth',true);
   [x0+.3,x1-.3].forEach(x=>{cyl(G.extra,x,-4.6,.04,.68,1.9,'plant');ball(G.extra,x,1.5,-4.65,.22,'plant');});
@@ -1129,7 +1166,7 @@ wallX(g0,4.17,7.81,9.24,0,H0,'wall',.14); wallX(g0,4.17,9.95,10.18,0,H0,'wall',.
 {const W=mat('noce'); [[7.81,9.235],[9.955,10.18]].forEach(([a,b])=>B(g0,a,b,0,H0,4.24,4.262,W)); B(g0,9.235,9.955,2.404,H0,4.24,4.262,W);
  [8.52,9.235,9.955].forEach(x=>B(g0,x-.002,x+.002,0,H0,4.262,4.264,GAPM,true)); B(g0,9.235,9.955,2.4,2.404,4.262,4.264,GAPM,true);
  vDoor(g0,{ax:'X',c:4.17,a0:9.24,a1:9.95,y0:0,y1:2.4,in:-1,hinge:1,d:.071,m:W,th:.04,pull:'none',nome:'Porta dissimulada do i.s. social (nogueira, push-to-open)'});}
-// --- lavandaria (≈ 2,4 × 2,3 m) ---
+// --- lavandaria (planta: 2,15 × 2,16 m entre paredes, 4,19 m² sem o canto das colunas da cozinha) ---
 // parede norte: bancada com tanque, armários em baixo, armários superiores e varão para cabides; porta de serviço livre a nascente
 B(g0,7.92,9.35,0,.86,.18,.78,'olive'); B(g0,7.9,9.37,.86,.9,.17,.8,'stone');
 [8.4,8.88].forEach(x=>B(g0,x,x+.005,.05,.84,.78,.785,'#BDB6AA',true));
@@ -1143,7 +1180,7 @@ B(g0,9.32,10.1,0,2.3,1.8,2.4,'olive'); B(g0,9.705,9.715,.05,2.25,1.79,1.8,'#BDB6
 // estendal de tecto rebatível e cesto da roupa
 [1.05,1.2,1.35].forEach(z=>B(g0,8.0,9.3,2.55,2.57,z,z+.02,'steel')); B(g0,8.0,8.02,2.57,H0,1.05,1.37,'iron'); B(g0,9.28,9.3,2.57,H0,1.05,1.37,'iron');
 cyl(g0,9.7,1.4,.22,0,.55,'cane');
-// --- i.s. social (≈ 1,65 × 1,67 m) ---
+// --- i.s. social (planta: 1,55 × 1,60 m, 2,45 m²) ---
 // sanita suspensa na parede comum com a lavandaria (esgoto e água ao lado das máquinas), autoclismo embutido com placa preta
 B(g0,8.53,10.18,0,H0,2.44,2.47,'stoneDark',true);   // parede de fundo em pedra / porcelânico de grande formato
 B(g0,9.35,9.73,.32,.42,2.47,3.02,'white'); B(g0,9.37,9.71,.15,.32,2.47,2.82,'white'); B(g0,9.46,9.62,1.0,1.2,2.47,2.48,'#1A1A1A',true);
@@ -1240,7 +1277,7 @@ for(let i=0;i<3;i++){const x=1.35+i*.7; B(g0,x,x+.45,0,.45,1.5,1.9,'cane'); B(g0
 B(g0,.95,2.7,1.5,1.62,.18,.79,'concrete'); B(g0,1.1,2.55,1.62,2.05,.18,.66,'concrete'); B(g0,1.31,2.52,2.05,H0,.18,.55,'concrete');   // chapéu e peito da chaminé até à laje (conjunto 0,75 m mais a poente, v126)
 B(g0,2.75,3.65,0,.9,.2,.75,'concrete');
 // --- Hall ---
-// móvel encastrado em madeira na parede-ressalto à esquerda de quem entra: 4 portas à face, sem puxador (pequenas arrumações; QE e ATI atrás das portas de cima)
+// móvel encastrado em madeira na parede-ressalto à esquerda de quem entra: 4 portas à face, sem puxador (pequenas arrumações; QE e central do alarme atrás das portas de cima, ATI atrás das de baixo)
 {const W=mat('noce'); [[5.5,5.84],[5.84,6.18]].forEach(([a,b])=>[[.06,.95],[.95,2.4]].forEach(([y0,y1])=>B(g0,9.5,9.52,y0+.004,y1-.004,a+.003,b-.003,W))); B(g0,9.495,9.5,.06,2.4,5.5,6.18,GAPM,true); B(g0,9.5,9.52,0,.06,5.5,6.18,'#2A2420',true);}
 // --- Quartos ---
 function bed(g,x0,x1,z0,z1,y0,hs,col){
@@ -1433,18 +1470,18 @@ const ROOMS=[
   luz:'Suspensão de grande diâmetro (papel/linho) no vazio, a 3,6 m; dois pendentes em latão sobre a mesa; cortina de linho a toda a altura do V12.',
   nota:'O escritório é um mezanino aberto sobre a sala, só com guarda de vidro a meia altura: o som passa directamente. Tapete grande, cortina pesada e tecto acústico no piso 1 resolvem a maior parte.',
   sw:['oak','linen','clay','leather','iron']},
- {id:'lavandaria',lvl:0,name:'Lavandaria',area:'≈ 5,4 m²',c:[9.0,1.2,1.3],
+ {id:'lavandaria',lvl:0,name:'Lavandaria',area:'4,19 m² (2,15 × 2,16 m, menos o canto das colunas da cozinha)',c:[9.0,1.2,1.3],
   mob:'Bancada a norte com tanque, torneira preta e armários em baixo e em cima, varão para cabides; coluna a sul com máquina de lavar e de secar empilhadas e armário alto de arrumação (vassouras, aspirador, tábua de engomar); estendal rebatível no tecto; cesto da roupa. Porta invisível para a cozinha e porta de serviço envidraçada para o exterior livres.',
   mat:'Frentes brancas mate iguais às da cozinha; tampo em calcário; pavimento em porcelânico de grande formato.',
   luz:'Calha LED estanque no tecto e fita LED sob os armários superiores.',
   nota:'A sanita do i.s. social fica do outro lado da parede das máquinas: esgotos curtos e na mesma prumada.',
   sw:['olive','stone','white','iron']},
- {id:'issocial',lvl:0,name:'I.s. social',area:'≈ 2,8 m²',c:[9.35,1.2,3.3],
+ {id:'issocial',lvl:0,name:'I.s. social',area:'2,45 m² (1,55 × 1,60 m)',c:[9.35,1.2,3.3],
   mob:'Porta dissimulada em folheado de nogueira, à face do revestimento da face sul do bloco da cozinha (push-to-open, como a da lavandaria). Sanita suspensa com autoclismo embutido e placa preta na parede de fundo; móvel suspenso em carvalho com tampo e lavatório em pedra, torneira de parede preta; espelho redondo retroiluminado; toalheiro preto.',
   mat:'Parede de fundo em pedra ou porcelânico de grande formato cinza quente; restantes paredes brancas; pavimento igual ao da cozinha.',
   luz:'Fita LED indirecta junto ao tecto, sobre o móvel, e espelho retroiluminado.',
   sw:['stoneDark','oak','stone','iron']},
- {id:'cozinha',lvl:0,name:'Cozinha',area:'14,08 m²',c:[6.2,1.2,2.0],
+ {id:'cozinha',lvl:0,name:'Cozinha',area:'13,24 m²',c:[6.2,1.2,2.0],
   mob:'Ilha de 0,90 × 2,40 m com placa na ponta norte, máquina de lavar loiça ao centro e lava-loiça na ponta sul; dois bancos a poente, sob tampo em consola, na zona do lava-loiça. Bancada norte só de arrumação, com congelador pequeno integrado na ponta nascente; colunas com frigoríficos e forno a nascente. O exaustor descarrega pelo tecto falso até ao canto nordeste da cozinha, atravessa a laje e sobe na chaminé exterior encostada à fachada norte do quarto do piso 1, até 79,62.',
   mat:'Como no render do arquitecto: frentes em lacado branco sem puxadores (bancada norte e móveis superiores, com nicho aberto em carvalho ao centro e LED por baixo); ilha, tampo e frente da bancada em mármore branco com veio cinza, ilha com remate em cascata; colunas em folheado de nogueira com fornos e frigorífico em inox; pavimento em soalho flutuante cinza claro (mapa de acabamentos); torneira preta mate.',
   luz:'Três pendentes lineares pretos sobre a ilha; fita LED sob os armários.',
@@ -1491,7 +1528,7 @@ const ROOMS=[
   nota:'Fica no percurso natural: pátio ou carro → mud room → escada → casa. O tanque e o ralo estão abaixo da cota do esgoto da rua, por isso precisam de estação elevatória.',
   sw:['oak','stoneDark','wall','linen']},
  {id:'tecnica',lvl:-1,name:'Zona técnica',area:'14,46 m²',c:[8.6,FM+1.2,3.4],
-  mob:'Parede poente, de norte para sul: baterias FoxESS EP12 (2, base a 0,50 m do chão), inversor com a caixa de junção HV por baixo, EPS Box e um módulo de arrumação novo (0,72 m); coluna de lavandaria com a máquina elevada sobre gaveta extraível e armário por cima; bomba de calor LG no canto sudoeste, com vasos de expansão e bomba de recirculação de AQS ao lado, e ralo de pavimento. Parede norte, de poente para nascente: 2.ª coluna de 2 baterias, Q-1 (quadro da zona técnica e da garagem, alimentado pela EPS Box: é o quadro com backup) e, no canto, o quadro de entrada (corte geral, descarregador, contador FoxESS) por cima do bastidor de rede 19" (router, switch PoE, gravador das câmaras). Q-1, quadro de entrada e bastidor são propostas do raio-X R01; no projecto de execução só há o QE e o ATI no hall. Parede nascente: sistema metálico preto com bancada em madeira (colunas nas pontas, gavetas, carro de ferramentas, armário de 2 portas, painel perfurado e armários altos).',
+  mob:'Parede poente, de norte para sul: baterias FoxESS EP12 (2, base a 0,50 m do chão), inversor com a caixa de junção HV por baixo, EPS Box e um módulo de arrumação novo (0,72 m); coluna de lavandaria com a máquina elevada sobre gaveta extraível e armário por cima; bomba de calor LG no canto sudoeste, com vasos de expansão e bomba de recirculação de AQS ao lado, e ralo de pavimento. Parede norte, de poente para nascente: 2.ª coluna de 2 baterias, Q-1 (quadro da zona técnica e da garagem, alimentado pela EPS Box: é o quadro com backup) e, no canto, o quadro de entrada (corte geral, descarregador, contador FoxESS) por cima do bastidor de rede 19" (ZAP da zona técnica com o ONT do operador, switch PoE das câmaras e dos Deco, gravador das câmaras), ligado ao ATI do hall. Q-1, quadro de entrada e bastidor são propostas do raio-X R01; no projecto de execução só há o QE e o ATI no hall. Parede nascente: sistema metálico preto com bancada em madeira (colunas nas pontas, gavetas, carro de ferramentas, armário de 2 portas, painel perfurado e armários altos).',
   mat:'Pavimento em grés técnico com ralo junto à máquina; paredes laváveis; grelhas de ventilação.',
   luz:'Calha LED estanque sobre a bancada e armaduras estanques no tecto.',
   nota:'Afastar a máquina de lavar ≥ 0,5 m das baterias e nunca ter tubagem de água por cima do inversor e das baterias. Respeitar os afastamentos de ventilação do fabricante e prever extracção de ar. No tecto, esteiras de 450 mm em anel (BT | DC | ITED) por cima dos quadros e das baterias, com ligação à garagem sobre o patamar da escada; a CT1 desce no canto nascente (ver Raio-X).',
@@ -1520,7 +1557,7 @@ const ROOMS=[
   luz:'Calha técnica sobre a secretária (4000 K); candeeiro de pé na zona de leitura (2700 K).',
   nota:'Mezanino aberto: a guarda de vidro a meia altura tem de ter ≥1,10 m e vidro laminado. Atenção também ao "buraco sobre o piso 0" assinalado na planta, junto à escada.',
   sw:['oak','felt','stone','linen','clay']},
- {id:'terraco',lvl:1,name:'Terraço',area:'≈ 13 m² a poente + faixa norte',c:[2.2,F1+1.0,2.0],
+ {id:'terraco',lvl:1,name:'Terraço',area:'13,47 m² a poente + faixa norte',c:[2.2,F1+1.0,2.0],
   mob:'Terraço à cota do piso 1 na zona poente junto ao quarto e na faixa norte sobre a cozinha. A cobertura dos quartos e da suite, à mesma cota, é técnica: painéis a 35° virados a sul, corredores de manutenção e escada de serviço para a cobertura do piso 1. A chaminé do grelhador e do forno a lenha sobe no canto noroeste do terraço (reboco branco e capeamento em aço preto); as espreguiçadeiras ficam viradas a poente, para a piscina. Na faixa norte, a chaminé do exaustor da cozinha sobe encostada à fachada do quarto, no topo nascente, e a floreira passou para nascente dela.',
   mat:'Deck compósito cinza quente; remate poente em murete baixo rebocado com guarda de vidro laminado (perfil de base e corrimão antracite) seguido de 3 vigotas brancas à cota da laje, que fazem de pérgola sobre a zona exterior da cozinha; parapeito rebocado no resto do contorno; painéis fotovoltaicos na metade sul da cobertura dos quartos.',luz:'Balizadores no parapeito.',
   sw:['deck','cane','terra','plant']}
@@ -1592,9 +1629,10 @@ const xFloorOf=y=>y<-.25?'pm1':y<=2.95?'p0':y<=6.05?'p1':'cob';
 const xIn=(y0,y1)=>{const f=XR.flt.floor; if(f==='all') return true; const r=XFL[f]; return y1>=r[0]&&y0<=r[1];};
 const XGRP=[['Energia',['ENT','ALIM','TOM','ILUM','EST','DC']],['Dados',['ITED','BUS']],['AC',['FRIG','COND']],['Água',['AF','AQ','RET','SOL']],['Esgoto, pluviais e ventilação',['AR','PLU','VENT']],['Segurança',['SEG']]];
 const XSYS={BT:'#E0312B',DC:'#FF8A00',ITED:'#2E7DFF'};
-const xmb=(c,op)=>new THREE.MeshBasicMaterial({color:c,toneMapped:false,transparent:op!=null,opacity:op==null?1:op,depthWrite:op==null});
+// v138: tudo transparente (opaco = opacidade 1) e desenhado depois das paredes-fantasma, que não escrevem profundidade: com as paredes a 60 % os cabos continuam à vista
+const xmb=(c,op)=>new THREE.MeshBasicMaterial({color:c,toneMapped:false,transparent:true,opacity:op==null?1:op,depthWrite:op==null});
 const XU={c:new THREE.CylinderGeometry(1,1,1,8),s:new THREE.SphereGeometry(1,10,8),b:new THREE.BoxGeometry(1,1,1)}; XU.e=new THREE.EdgesGeometry(XU.b);
-const XLM={}, xlm=c=>XLM[c]||(XLM[c]=new THREE.LineBasicMaterial({color:c,toneMapped:false}));
+const XLM={}, xlm=c=>XLM[c]||(XLM[c]=new THREE.LineBasicMaterial({color:c,toneMapped:false,transparent:true}));
 const xo=new THREE.Object3D(), XV=new THREE.Vector3(), XY=new THREE.Vector3(0,1,0);
 const xe=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const xn=v=>(+v).toFixed(2).replace('.',',').replace('-','−');
@@ -1624,7 +1662,7 @@ function xBuild(D){
   // --- dispositivos (um InstancedMesh por tipo)
   const DT={'interruptor':['b',.075,'#111111'],'tomada':['b',.075,'#C62828'],'alimentação dedicada':['b',.09,'#B71C1C'],'ponto de luz':['s',.05,'#F2B705'],'comando/ecrã':['b',.09,'#1565C0'],
     'motor de estore':['b',.07,'#558B2F'],'motor de cortina':['b',.07,'#558B2F'],'tomada ITED':['b',.075,'#2E7DFF'],'tomada ITED (RJ45 + coaxial)':['b',.075,'#2E7DFF'],
-    'dispositivo PoE':['s',.055,'#2E7DFF'],'ponto de água':['s',.045,'#00A8E8'],'sifão':['s',.045,'#7CB342'],'exterior':['s',.06,'#8E24AA'],
+    'dispositivo PoE':['s',.055,'#2E7DFF'],'ponto de acesso Wi-Fi':['s',.075,'#00ACC1'],'ZAP ITED':['b',.1,'#0D47A1'],'ponto de água':['s',.045,'#00A8E8'],'sifão':['s',.045,'#7CB342'],'exterior':['s',.06,'#8E24AA'],
     // segurança Ajax (camada SEG)
     'central de alarme':['b',.13,'#00C853'],'repetidor de rádio':['b',.11,'#00C853'],'teclado':['b',.09,'#00C853'],'contacto de abertura':['b',.055,'#69F0AE'],
     'detector de movimento':['s',.065,'#00E676'],'detector de quebra de vidro':['s',.05,'#B9F6CA'],'detector exterior':['s',.08,'#1DE9B6'],'cortina exterior':['b',.075,'#1DE9B6'],
@@ -1675,6 +1713,9 @@ function xBuild(D){
   xLegend(); if(innerWidth<900) document.getElementById('xlegd').open=false; xApply(); document.getElementById('xst').textContent=`${D.percursos.length} percursos · ${D.dispositivos.length} dispositivos`;
   if(XR.on) xInfoIntro();
   if(typeof segBuild==='function') segBuild(D);   // dispositivos de segurança físicos no 3D (opção Segurança)
+  if(typeof wifiBuild==='function') wifiBuild(D);   // Deco físicos no 3D (opção Rede Wi-Fi, v138)
+  XR.g.traverse(o=>{if(o.isMesh||o.isLineSegments) o.renderOrder=o.isInstancedMesh?5:4;});   // por cima das paredes-fantasma (v138)
+  vhApply(VH.start||location.hash);   // vista pedida no endereço (#raiox-…)
 }
 const CCY=-.3;   // face inferior da laje do piso 0 (tecto da cave)
 
@@ -1713,7 +1754,7 @@ function xFly(){const v=XVIEW[XR.flt.floor]; flyTo(off(v[0],v[1]));}
 
 // ---------- selecção ----------
 function xClear(){while(XR.hi.children.length){const o=XR.hi.children.pop(); if(o.material&&o.material.dispose) o.material.dispose();}
-  Object.values(XR.mats).forEach(m=>{m.transparent=false;m.opacity=1;m.depthWrite=true;m.needsUpdate=true;});}
+  Object.values(XR.mats).forEach(m=>{m.transparent=true;m.opacity=1;m.depthWrite=true;m.needsUpdate=true;});}
 function xHi(ids,boxes){xClear(); const set=new Set(ids||[]);
   if(set.size) Object.values(XR.mats).forEach(m=>{m.transparent=true;m.opacity=.16;m.depthWrite=false;m.needsUpdate=true;});
   set.forEach(id=>{const p=XR.P[id]; if(!p) return; const l=XR.LAY[p.camada], mat=new THREE.MeshBasicMaterial({color:l.cor,toneMapped:false,depthTest:false,transparent:true,opacity:.95});
@@ -1759,6 +1800,7 @@ function xInfoIntro(){xClear(); const D=XR.D; if(!D){xCard('<h2>Raio-X de redes<
   <dt>Esteiras</dt><dd>450 × 60 mm a −0,39 com separadores metálicos: BT | DC (com tampa) | ITED. Nos Ts (T1–T4) o compartimento do lado do ramal liga directo e os outros cruzam por ponte.</dd>
   <dt>Regras</dt><dd>Electricidade sempre por cima da água; nada pendurado na zona do portão; zonas secas sobre quadros, baterias, inversor e V2C; descidas pelo fundo da esteira.</dd>
   <dt>Segurança</dt><dd>Camada SEG: plano Ajax de 12/11 — hub no hall, 2 ReX 2 por Ethernet, contactos, MotionCam, GlassProtect, detectores exteriores, incêndio e inundação (pontos verdes, laranja e azuis, sem fios) e as 12 câmaras PoE com os cabos desde o bastidor; a opção «Cobertura das câmaras» (fora do Raio-X) mostra o que cada uma vê.</dd>
+  <dt>ITED e Wi-Fi</dt><dd>Operadores: CVM → ATI no móvel do hall, por baixo do QE (como no projecto ITED); as tomadas saem do ATI. O ATI liga ao bastidor da ZT (ITED-ATI): fibra, coaxial e 2 RJ45 de ida para a ZAP da ZT, onde fica o ONT, e 4 Cat6A de volta. 6 Deco TP-Link com backhaul por cabo: X55 principal na TV da sala, X55 no escritório, X50-PoE no hall e na esteira da garagem, X50-Outdoor na fachada nascente e no deck (opção «Rede Wi-Fi»).</dd>
   <dt>Pluviais</dt><dd>Camada PLU: tubos de queda TQ1–TQ6, cortes C1–C5, pilares fictícios e tubos ladrão da planta de cobertura R01 — posições marcadas à escala, a confirmar em obra antes de carotar.</dd></dl>`);}
 function xInfoRoute(id){const p=XR.P[id]; if(!p) return; xHi([id]); const l=XR.LAY[p.camada];
   xCard(`<h2>${xdot(p.camada)}${xe(p.id)}</h2><p class="meta">${xe(l.nome)} · ${xe(p.estado)}</p>
@@ -1840,6 +1882,44 @@ document.getElementById('xop').addEventListener('input',e=>{XR.op=e.target.value
 document.getElementById('xray').addEventListener('click',e=>{const b=e.currentTarget,on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',on);
   if(on&&mode!=='ext'&&mode!=='roof') setMode('ext');   // antes de tornar os materiais transparentes, para nenhum ficar de fora
   setXray(on); if(on) xFly();});
+
+// ---------- v138: vista partilhável no endereço — #raiox-paredes60-frig-cond (só letras, algarismos e hífens, que o claude.ai deixa passar) ----------
+// raiox = Raio-X ligado · paredesNN = opacidade das paredes · ids das camadas em minúsculas = só essas ligadas (semcamadas = nenhuma) ·
+// cave / piso0 / piso1 / cobertura = filtro de piso · troncos = só troncos · sem<opção> / com<opção> = opções do painel (semseg, semwifi, comcov…) ·
+// c<x>x<y>x<z>a<x>x<y>x<z> = câmara e alvo em decímetros (n = negativo). O botão «Copiar link desta vista» escreve isto no endereço.
+const VH={own:null,start:location.hash};   // o arranque da página troca o endereço pela divisão (#escritorio): guarda-se o pedido antes disso
+const VHF={cave:'pm1',piso0:'p0',piso1:'p1',cobertura:'cob'}, VHFi={pm1:'cave',p0:'piso0',p1:'piso1',cob:'cobertura'};
+const vhN=v=>{const k=Math.round(v*10); return (k<0?'n':'')+Math.abs(k);};
+const vhD=s=>{const m=/^(n?)(\d+)$/.exec(s); return m?(m[1]?-1:1)*(+m[2])/10:NaN;};
+function vhName(){ if(!XR.on||!XR.D) return '';
+  const t=['raiox','paredes'+Math.round(XR.op*100)];
+  if(XR.flt.floor!=='all') t.push(VHFi[XR.flt.floor]);
+  const ids=Object.keys(XR.L), on=ids.filter(id=>XR.L[id].on);
+  if(!on.length) t.push('semcamadas'); else if(on.length<ids.length) on.forEach(id=>t.push(id.toLowerCase()));
+  if(XR.flt.trunk) t.push('troncos');
+  document.querySelectorAll('input[type=checkbox][data-k]').forEach(cb=>{if(cb.checked!==cb.defaultChecked) t.push((cb.checked?'com':'sem')+cb.dataset.k);});
+  const p=camera.position, q=controls.target; t.push('c'+[p.x,p.y,p.z].map(vhN).join('x')+'a'+[q.x,q.y,q.z].map(vhN).join('x'));
+  return t.join('-');}
+function vhApply(h){ h=String(h||'').replace(/^#/,'').toLowerCase(); if(!h||h===VH.own||!XR.D) return; VH.own=h;
+  const t=h.split('-').filter(Boolean);
+  t.forEach(k=>{const m=/^(sem|com)([a-z0-9]+)$/.exec(k); if(!m||m[2]==='camadas') return; const cb=document.querySelector(`input[type=checkbox][data-k="${m[2]}"]`); if(cb&&cb.checked!==(m[1]==='com')) cb.click();});
+  const cam=t.map(k=>/^c(n?\d+)x(n?\d+)x(n?\d+)a(n?\d+)x(n?\d+)x(n?\d+)$/.exec(k)).find(Boolean);
+  if(t.includes('raiox')){const b=document.getElementById('xray'); if(b.getAttribute('aria-pressed')!=='true') b.click();
+    const w=t.map(k=>/^paredes(\d{1,3})$/.exec(k)).find(Boolean); if(w){const s=document.getElementById('xop'); s.value=Math.min(+s.max,+w[1]); s.dispatchEvent(new Event('input'));}
+    const fk=t.find(k=>VHF[k]); XR.flt.floor=fk?VHF[fk]:'all'; document.querySelectorAll('#xfloor button[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===XR.flt.floor));
+    const ids=Object.keys(XR.L), want=ids.filter(id=>t.includes(id.toLowerCase()));
+    if(want.length||t.includes('semcamadas')) ids.forEach(id=>{XR.L[id].on=want.includes(id);});
+    document.querySelectorAll('#xleg button[data-l]').forEach(x=>{const L=XR.L[x.dataset.l]; if(L) x.setAttribute('aria-pressed',L.on);});
+    XR.flt.trunk=t.includes('troncos'); const tb=document.querySelector('#xshow button[data-s="trunk"]'); if(tb) tb.setAttribute('aria-pressed',XR.flt.trunk);
+    xApply(); if(!cam) xFly(); try{history.replaceState(null,'','#'+h);}catch(e){}}
+  if(cam){const v=cam.slice(1).map(vhD); if(v.every(Number.isFinite)){anim=null; camera.position.set(v[0],v[1],v[2]); controls.target.set(v[3],v[4],v[5]); controls.update();}}
+}
+addEventListener('hashchange',()=>vhApply(location.hash));
+document.getElementById('xlinkb').addEventListener('click',()=>{const n=vhName(), st=document.getElementById('xlinks'); if(!n) return;
+  VH.own=n; try{location.hash=n;}catch(e){}
+  const framed=(()=>{try{return window.self!==window.top;}catch(e){return true;}})(), txt=framed?'#'+n:location.href;
+  const done=ok=>{st.hidden=false; st.textContent=ok?(framed?'Vista guardada no endereço da página: Partilhar → Copiar link já a leva. Copiado o fim do link: #'+n:'Link copiado: '+txt):'Copia o fim do link: #'+n;};
+  try{navigator.clipboard.writeText(txt).then(()=>done(true),()=>done(false));}catch(e){done(false);}});
 // ================= PASSEIO na 1.ª pessoa (como no BIMx): olhos a 1,60 m, colisão com paredes e móveis, sobe escadas e rampas =================
 const WALK={on:false,pos:new THREE.Vector3(),yaw:0,pitch:0,keys:{},joy:{x:0,y:0},cols:[],near:[],nearAt:new THREE.Vector3(1e9,0,1e9),t:0,saved:null,eye:1.6,R:.28};
 function walkCols(){ const NO=new Set([glass,railGlass,water,INVIS]); const out=[];
@@ -1911,7 +1991,7 @@ document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',(
 const lowBtn=document.getElementById('low');
 lowBtn.addEventListener('click',()=>{const on=lowBtn.getAttribute('aria-pressed')!=='true';lowBtn.setAttribute('aria-pressed',on);setLow(on);segLow(on);});
 const LV={pm1:-1,p0:0,p1:1};
-document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked; if(k==='ix2pat')OPT.ix2out.visible=!cb.checked; if(k==='mudopen')OPT.mudwall.visible=!cb.checked; if(k==='seg')Object.values(SEGG).forEach(g=>g.visible=cb.checked); if(k==='cov')covSet(cb.checked);}};ap();cb.addEventListener('change',ap);});
+document.querySelectorAll('#opts input[data-k]').forEach(cb=>{const k=cb.dataset.k;const ap=()=>{if(k==='labels')document.getElementById('labels').style.display=cb.checked?'':'none';else{if(k==='pines'){shadowOnly(OPT.pines,!cb.checked);return;} OPT[k].visible=cb.checked; if(k==='cinema')OPT.lounge.visible=!cb.checked; if(k==='xmas')OPT.dclosed.visible=!cb.checked; if(k==='ix2pat')OPT.ix2out.visible=!cb.checked; if(k==='mudopen')OPT.mudwall.visible=!cb.checked; if(k==='seg')Object.values(SEGG).forEach(g=>g.visible=cb.checked); if(k==='cov')covSet(cb.checked); if(k==='wifi')Object.values(WIFG).forEach(g=>g.visible=cb.checked);}};ap();cb.addEventListener('change',ap);});
 {const dS=document.getElementById('sunDay'),hS=document.getElementById('sunHr'),pB=document.getElementById('sunPlay');
  const today=()=>{const d=new Date();return Math.min(365,Math.max(1,SUN.doy(d.getMonth(),d.getDate())));};
  const apply=()=>SUN.set(+dS.value,+hS.value);
