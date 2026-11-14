@@ -207,7 +207,7 @@ const M = {};
 const TEXK={oak:['wood',1.2],oakDark:['wood',1.2],pine:['wood',1.2],darkWood:['wood',1.2],deck:['deck',1.5],stone:['stone',1.2],stoneDark:['stone',1.2],azulejo:['stone',1.2],
   concrete:['concrete',2],garageFloor:['concrete',2.5],terra:['concrete',1],asphalt:['asphalt',3],wallOut:['render',2],wall:['render',2],darkRender:['render',2],ribbed:['ribbed',1],
   linen:['fabric',.4],felt:['fabric',.4],bedding:['fabric',.5],clay:['rug',.6],leather:['leather',.5],grass:['grass',2.5],terrain:['grass',3],gravel:['gravel',1.2],sand:['gravel',1.5]};
-const SOFT={linen:1,felt:1,leather:1,bedding:1,cane:1};
+const SOFT={linen:1,felt:1,leather:1,bedding:1,cane:1,sofaGreen:1}; PAL.sofaGreen='#84906F'; TEXK.sofaGreen=['fabric',.4];   // v140: tecido verde seco do sofá da sala
 const TEXC={};
 function texOf(kind){ if(TEXC[kind]) return TEXC[kind];
   const N=512,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');let sd=kind.length*977;const r=()=>((sd=(sd*16807)%2147483647)/2147483647);
@@ -784,9 +784,7 @@ for(let a=-75;a<=75;a+=25){const r=a*Math.PI/180;const m=B(G.extra,-.35,.35,0,.4
 [].forEach(([x,z])=>cyl(G.extra,x,z,.3,-.03,.03,'stone'));
 // casa das máquinas da piscina (enterrada) e duche exterior
 B(G.extra,-16.4,-13.6,.06,.12,-1.2,.8,'concrete'); B(G.extra,-15.6,-14.6,.12,.14,-.7,.3,'iron');
-// compostagem: compóstor rotativo fechado para restos de cozinha junto à horta; compartimento aberto para resíduos de jardim no canto sudoeste
-{const t=new THREE.Mesh(new THREE.CylinderGeometry(.4,.4,.9,20),mat('#2A2A2A'));t.rotation.z=Math.PI/2;t.position.set(4.7,.75,-5.75);t.castShadow=true;G.extra.add(t);
- [4.2,5.2].forEach(x=>B(G.extra,x-.03,x+.03,0,.75,-5.8,-5.7,'iron'));}
+// compostagem: compartimento aberto para resíduos de jardim no canto sudoeste (o compóstor de cozinha junto à horta saiu na v142: a faixa norte é do estendal)
 [[-37.0,-36.4],[-36.4,-35.8]].forEach(([a,b])=>{B(G.extra,a,a+.04,0,.8,7.9,8.7,'oakDark');B(G.extra,b-.04,b,0,.8,7.9,8.7,'oakDark');B(G.extra,a,b,0,.8,7.9,7.94,'oakDark');B(G.extra,a+.04,b-.04,0,.45,7.95,8.65,'earth',true);});
 B(G.extra,-13.4,-12.4,.04,.08,.3,1.3,'stone'); cyl(G.extra,-12.55,.45,.04,.08,2.2,'iron'); B(G.extra,-12.95,-12.55,2.15,2.2,.25,.65,'iron');
 // relvado de jogo informal (escalracho) a norte da piscina e do deck: só duas balizas pequenas móveis
@@ -866,15 +864,20 @@ cyl(G.extra,28.2,.6,.12,0,1.4,'oakDark'); ball(G.extra,28.2,1.9,.6,.8,'plant');
 // três oliveiras existentes a poente, junto ao muro da diagonal
 [[-21.8,.4],[-26.8,3.9],[-31.9,7.5]].forEach(([x,z],i)=>{const t=cyl(G.extra,x,z,.18,0,1.5,'#6E5E4B');t.rotation.z=(i-1)*.12;
   [[0,2.2,0,1.3],[.7,2.0,.4,.9],[-.6,2.1,-.3,.95],[.2,2.7,-.2,.8]].forEach(([dx,y,dz,r])=>{const b=ball(G.extra,x+dx,y,z+dz,r,'oliveLeaf');b.scale.y=.7;});});
-// horta elevada junto à porta de serviço da lavandaria e à escada exterior: 4 canteiros norte-sul 1,0 x 2,6 m
+// horta elevada junto à porta de serviço da lavandaria e à escada exterior (v142): 3 canteiros nascente–poente 2,6 × 1,0 m, a 3,0–4,0 m da fachada; a norte, junto à sebe, o estendal (0,7 m livres entre os dois)
 B(G.extra,0.4,10.25,-.03,.01,-5.3,-1.46,'gravel',true);
 B(G.extra,10.35,12.04,-.05,.02,-1.6,-.25,'stone');   // patamar da escada exterior, encostado ao passadiço (v136)
 wallZ(G.extra,10.35,-6.1,-1.6,0,1.0,'wallOut',.2); wallZ(G.extra,11.9,-5.4,-1.5,0,1.0,'wallOut',.2);   // v136: só ao longo do lanço; junto ao patamar estava a mais
-[0.7,2.3,3.9,5.5,7.1,8.7].forEach(x0=>{const x1=x0+1.0,z0=-5.1,z1=-2.5;
+[0.7,3.9,7.1].forEach(x0=>{const x1=x0+2.6,z0=-4.2,z1=-3.2;   // canteiros elevados, só com plantas baixas (nada alto que faça sombra ao estendal)
   B(G.extra,x0,x1,0,.67,z0,z1,'wallOut');B(G.extra,x0-.05,x1+.05,.67,.72,z0-.05,z1+.05,'stone');B(G.extra,x0+.12,x1-.12,.6,.68,z0+.12,z1-.12,'earth',true);
-  [x0+.3,x1-.3].forEach(x=>{cyl(G.extra,x,-4.6,.04,.68,1.9,'plant');ball(G.extra,x,1.5,-4.65,.22,'plant');});
-  B(G.extra,x0,x1,1.95,1.97,-5.0,-4.96,'iron');[x0,x1-.04].forEach(x=>B(G.extra,x,x+.04,.7,2.0,-5.02,-4.96,'iron'));
-  for(let z=-3.7;z<-2.6;z+=.35) ball(G.extra,x0+.5,.82,z,.16,'plant');});
+  for(let x=x0+.3;x<x1-.2;x+=.4){ball(G.extra,x,.82,z0+.3,.15,'plant');ball(G.extra,x+.2,.82,z1-.3,.14,'plant');}
+  [x0+.65,x1-.65].forEach(x=>{cyl(G.extra,x,(z0+z1)/2,.03,.68,1.15,'plant');ball(G.extra,x,1.15,(z0+z1)/2,.2,'plant');});});
+// estendal (v142): 2 postes em T de aço galvanizado (Ø 5 cm, 1,85 m) a 6,0 m um do outro, 5 linhas a 17,5 cm (≈ 30 m de corda); a linha norte a 0,65 m da sebe; chão em gravilha até à sebe
+B(G.extra,0.4,7.0,-.03,.01,-6.2,-5.3,'gravel',true);
+{const zc=-5.25, xa=.6, xb=6.6;
+ [xa,xb].forEach(x=>{cyl(G.extra,x,zc,.025,0,1.85,'steel'); B(G.extra,x-.02,x+.02,1.8,1.85,-5.63,-4.87,'steel');});
+ [-5.6,-5.425,-5.25,-5.075,-4.9].forEach(z=>B(G.extra,xa,xb,1.795,1.802,z-.003,z+.003,'#E8E8E4',true));
+ [[1.3,-5.6,'#D9CBB5'],[2.15,-5.425,'#B9C7CF'],[4.4,-5.075,'#E6E2D8']].forEach(([x,z,c])=>B(G.extra,x,x+.7,1.25,1.795,z-.006,z+.006,c));}   // 3 toalhas a secar
 cyl(G.extra,10.0,-2.2,.05,0,.8,'iron');
 cyl(G.extra,16,7,.12,0,1.6,'oakDark'); ball(G.extra,16,2.1,7,.9,'plant'); ball(G.extra,15.5,1.8,6.8,.6,'plant');
 
@@ -1227,9 +1230,18 @@ wallZ(g0,21.55,5.9,6.2,0,H0,'wall',.1); wallZ(g0,21.55,7.07,7.65,0,F1-.79,'wall'
 B(g0,21.5,21.6,2.38,F1-.79,6.2,7.07,'wall'); vDoor(g0,{ax:'Z',c:21.55,a0:6.21,a1:7.06,y0:0,y1:2.37,in:1,hinge:0,m:mat('lightOak'),th:.03,pull:'flush',nome:'Porta dissimulada do vestuário (continua os roupeiros)'});
 
 // --- Sala ---
-B(g0,.5,4.0,0,.42,4.35,5.25,'linen'); B(g0,.5,4.0,.42,.85,4.35,4.6,'linen');
-B(g0,.5,1.4,0,.42,5.25,6.4,'linen'); B(g0,.5,.75,.42,.85,4.6,6.4,'linen');
-for(let i=0;i<4;i++) B(g0,.8+i*.8,1.45+i*.8,.42,.58,4.65,4.85,'bedding');
+// sofá Antarte de 3 lugares + chaise longue (v140): 3,39 × 1,70 m; assento a 0,42 m (lugares 75 × 73 cm); braços 0,20 m de largura e 0,51 m de altura; almofadas de encosto 73 × 15 × 43 cm até 0,80 m;
+// chaise 0,95 m de largura (com o braço), do lado poente, junto ao V12 — a da loja tem a chaise à direita de quem a vê de frente; aqui é a versão «esquerda». Costas a norte como o anterior (z 4,35), virado à TV.
+{const g=g0, F='sofaGreen', LEG=new THREE.MeshStandardMaterial({color:'#2E241E',roughness:.5}), xw=.5, xe=3.89, z0=4.35, zm=z0+.95, zc=z0+1.70, a=.2, cw=.75, sw=(xe-xw-2*a-cw)/3, xc=xw+a+cw;
+ const leg=(x,z)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.022,.013,.14,14),LEG);m.position.set(x,.07,z);m.castShadow=true;g.add(m);};
+ B(g,xw+a,xe-a,.14,.62,z0,z0+.1,F);                               // costas (por trás das almofadas)
+ B(g,xw,xw+a,.14,.51,z0,zm,F); B(g,xe-a,xe,.14,.51,z0,zm,F);       // braços baixos: poente (na chaise) e nascente
+ B(g,xc,xe-a,.14,.26,z0+.1,zm,F); B(g,xw,xc,.14,.26,z0+.1,zc,F);  // bases: 3 lugares e chaise (a chaise tem a largura toda à frente do braço)
+ for(let i=0;i<3;i++) B(g,xc+i*sw+.006,xc+(i+1)*sw-.006,.26,.42,z0+.1,zm,F);   // assentos dos 3 lugares
+ B(g,xw+a+.006,xc-.006,.26,.42,z0+.1,zc,F); B(g,xw,xw+a,.26,.42,zm,zc,F);       // assento da chaise
+ [xw+a+cw/2,xc+sw/2,xc+1.5*sw,xc+2.5*sw].forEach(x=>B(g,x-.365,x+.365,.37,.8,z0+.1,z0+.25,F));   // 4 almofadas de encosto
+ [xw+a+cw/2,xc+2.5*sw].forEach(x=>B(g,x-.27,x+.27,.42,.66,z0+.25,z0+.37,F));    // 2 almofadas lombares
+ [[xw+.06,z0+.06],[xe-.06,z0+.06],[xe-.06,zm-.06],[xc+.06,zm-.06],[xw+.06,zc-.06],[xc-.06,zc-.06]].forEach(([x,z])=>leg(x,z));}   // pés cónicos em faia lacada castanho escuro
 B(g0,.6,4.4,.02,.035,5.0,7.45,'clay',true);
 B(g0,1.9,3.0,0,.32,5.7,6.5,'stone');
 B(g0,.9,3.6,.14,.5,7.3,7.65,'#1C1C1E'); B(g0,2.45,3.55,.18,.46,7.295,7.3,'lightOak'); B(g0,2.45,3.55,.315,.318,7.293,7.296,GAPM,true);
@@ -1257,15 +1269,15 @@ B(g0,4.8,7.75,.92,1.62,.2,.225,'marble');
 B(g0,4.8,5.98,1.62,2.42,.2,.55,'whiteLac'); B(g0,6.82,7.75,1.62,2.42,.2,.55,'whiteLac'); [5.39,7.285].forEach(x=>B(g0,x-.002,x+.002,1.64,2.4,.55,.552,GAPM,true));
 B(g0,5.98,6.82,1.62,1.65,.2,.55,'lightOak'); B(g0,5.98,6.82,2.39,2.42,.2,.55,'lightOak'); B(g0,5.98,6.0,1.62,2.42,.2,.55,'lightOak'); B(g0,6.8,6.82,1.62,2.42,.2,.55,'lightOak'); B(g0,6.0,6.8,1.65,2.39,.2,.215,'lightOak'); B(g0,6.0,6.8,2.0,2.02,.215,.53,'lightOak');
 B(g0,4.83,5.95,1.613,1.62,.25,.5,LEDM,true); B(g0,6.85,7.72,1.613,1.62,.25,.5,LEDM,true); cyl(g0,6.2,.4,.05,1.65,1.82,'white'); cyl(g0,6.35,.4,.05,1.65,1.78,'white'); cyl(g0,6.6,.38,.07,2.02,2.14,'#2E4A7A');
-B(g0,5.81,6.71,0,.88,1.71,4.11,'marble'); B(g0,5.56,6.73,.88,.95,1.69,4.12,'marble'); B(g0,5.56,6.73,0,.88,4.06,4.12,'marble');   // ilha toda em mármore, com remate em cascata a sul   // ilha 0,90 × 2,40 m à face da linha cozinha/sala, deslocada 12 cm para nascente (norte ≈ 0,95 m, poente ≈ 1,06 m, nascente ≈ 1,10 m) + tampo em consola de 25 cm a poente para os bancos
+B(g0,5.83,6.73,0,.88,1.71,4.11,'marble'); B(g0,5.58,6.75,.88,.95,1.69,4.12,'marble'); B(g0,5.58,6.75,0,.88,4.06,4.12,'marble');   // v141: tampo a 1,10 m das colunas   // ilha toda em mármore, com remate em cascata a sul   // ilha 0,90 × 2,40 m à face da linha cozinha/sala, deslocada 12 cm para nascente (norte ≈ 0,95 m, poente ≈ 1,06 m, nascente ≈ 1,10 m) + tampo em consola de 25 cm a poente para os bancos
 // ilha: placa a norte, máquina de lavar loiça ao centro (porta para nascente), lava-loiça a sul; bancos a poente só na zona do lava-loiça
-B(g0,6.05,6.65,.95,.955,1.85,2.6,'#111111',true); B(g0,6.12,6.62,.9,.956,3.35,3.95,'#C9CCCE',true); cyl(g0,6.03,3.65,.015,.95,1.3,'iron'); B(g0,6.03,6.15,1.27,1.3,3.63,3.67,'iron');
-[2.72,3.32].forEach(z=>B(g0,6.71,6.713,.08,.82,z-.002,z+.002,GAPM,true));
-for(let i=0;i<3;i++){const z=2.62+i*.53; B(g0,5.2,5.55,0,.68,z,z+.35,'iron'); B(g0,5.2,5.55,.68,.72,z,z+.35,'#222222');}
-B(g0,6.0,6.65,2.05,2.15,1.85,2.55,'white'); B(g0,6.22,6.43,2.15,H0,2.1,2.3,'white');   // exaustor de ilha
+B(g0,6.07,6.67,.95,.955,1.85,2.6,'#111111',true); B(g0,6.14,6.64,.9,.956,3.35,3.95,'#C9CCCE',true); cyl(g0,6.05,3.65,.015,.95,1.3,'iron'); B(g0,6.05,6.17,1.27,1.3,3.63,3.67,'iron');
+[2.72,3.32].forEach(z=>B(g0,6.73,6.733,.08,.82,z-.002,z+.002,GAPM,true));
+for(let i=0;i<3;i++){const z=2.62+i*.53; B(g0,5.22,5.57,0,.68,z,z+.35,'iron'); B(g0,5.22,5.57,.68,.72,z,z+.35,'#222222');}
+B(g0,6.02,6.67,2.05,2.15,1.85,2.55,'white'); B(g0,6.24,6.45,2.15,H0,2.1,2.3,'white');   // exaustor de ilha
 // bancada norte só de arrumação, com congelador pequeno integrado na ponta nascente
 
-[3.15,3.75].forEach(z=>{cyl(g0,6.26,z,.01,2.0,H0,'iron');B(g0,6.11,6.41,1.85,1.9,z-.02,z+.02,'iron')});
+[3.15,3.75].forEach(z=>{cyl(g0,6.28,z,.01,2.0,H0,'iron');B(g0,6.13,6.43,1.85,1.9,z-.02,z+.02,'iron')});
 // --- Refeições exterior ---
 B(g0,1.2,3.4,.72,.78,2.0,3.1,'stone'); [1.3,3.25].forEach(x=>B(g0,x,x+.1,0,.72,2.4,2.7,'iron'));
 for(let i=0;i<3;i++){const x=1.35+i*.7; B(g0,x,x+.45,0,.45,1.5,1.9,'cane'); B(g0,x,x+.45,0,.45,3.2,3.6,'cane');}
@@ -1465,11 +1477,11 @@ B(g1,7.1,7.6,F1+.04,H1+1.17,.4,.845,'wallOut'); B(g1,7.06,7.64,H1+1.17,H1+1.22,.
 // ---------- Divisões ----------
 const ROOMS=[
  {id:'sala',lvl:0,name:'Sala',area:'31,28 m² · pé-direito duplo',c:[4.6,1.2,5.85],
-  mob:'Sofá modular baixo em L, bouclé cinza quente; poltrona lounge em couro conhaque; mesa de centro baixa em travertino; mesa de jantar extensível em carvalho claro: 2,00 m fechada (8 lugares) e 3,40 m aberta (14 lugares), 0,30 m mais a sul para a passagem hall–cozinha–sala ficar com ≈1,1 m livres.',
+  mob:'Sofá Antarte de 3 lugares com chaise longue, 3,39 × 1,70 m, em tecido verde seco, com a chaise do lado poente, junto ao vidro (é a versão com a chaise à esquerda de quem olha o sofá de frente; a da loja tem-na à direita); pés cónicos em faia lacada castanho escuro; poltrona lounge em couro conhaque; mesa de centro baixa em travertino; mesa de jantar extensível em carvalho claro: 2,00 m fechada (8 lugares) e 3,40 m aberta (14 lugares), 0,30 m mais a sul para a passagem hall–cozinha–sala ficar com ≈1,1 m livres.',
   mat:'Soalho flutuante em carvalho cinza claro (FINFLOOR Original 77N Roble Titanio ou Swiss Krono Artisan Oak Grey, Anexo 2 do contrato); parede da TV em revestimento texturado cinza; móvel da TV preto com gavetas em carvalho; paredes brancas mate lisas; tapete de lã texturado em tons areia.',
   luz:'Suspensão de grande diâmetro (papel/linho) no vazio, a 3,6 m; dois pendentes em latão sobre a mesa; cortina de linho a toda a altura do V12.',
   nota:'O escritório é um mezanino aberto sobre a sala, só com guarda de vidro a meia altura: o som passa directamente. Tapete grande, cortina pesada e tecto acústico no piso 1 resolvem a maior parte.',
-  sw:['oak','linen','clay','leather','iron']},
+  sw:['oak','sofaGreen','clay','leather','iron']},
  {id:'lavandaria',lvl:0,name:'Lavandaria',area:'4,19 m² (2,15 × 2,16 m, menos o canto das colunas da cozinha)',c:[9.0,1.2,1.3],
   mob:'Bancada a norte com tanque, torneira preta e armários em baixo e em cima, varão para cabides; coluna a sul com máquina de lavar e de secar empilhadas e armário alto de arrumação (vassouras, aspirador, tábua de engomar); estendal rebatível no tecto; cesto da roupa. Porta invisível para a cozinha e porta de serviço envidraçada para o exterior livres.',
   mat:'Frentes brancas mate iguais às da cozinha; tampo em calcário; pavimento em porcelânico de grande formato.',
@@ -1534,7 +1546,7 @@ const ROOMS=[
   nota:'Afastar a máquina de lavar ≥ 0,5 m das baterias e nunca ter tubagem de água por cima do inversor e das baterias. Respeitar os afastamentos de ventilação do fabricante e prever extracção de ar. No tecto, esteiras de 450 mm em anel (BT | DC | ITED) por cima dos quadros e das baterias, com ligação à garagem sobre o patamar da escada; a CT1 desce no canto nascente (ver Raio-X).',
   sw:['white','#1E1E1E','oak','stone']},
  {id:'exterior',lvl:0,name:'Exterior e acessos',area:'lote 1091,80 m²',c:[0,0,3],d:[-26,34,36],
-  mob:'Piscina de 57 m² com deck à volta (o mesmo deck do lado da sala); casa das máquinas enterrada sob o deck, junto ao duche; duche exterior junto à escada da piscina; relvado de jogo informal em escalracho a norte da piscina e do deck, com duas balizas pequenas móveis; lareira exterior com banco curvo junto ao canto norte do deck; horta junto à lavandaria; lugar exterior com carregador AC ao lado da rampa.',
+  mob:'Piscina de 57 m² com deck à volta (o mesmo deck do lado da sala); casa das máquinas enterrada sob o deck, junto ao duche; duche exterior junto à escada da piscina; relvado de jogo informal em escalracho a norte da piscina e do deck, com duas balizas pequenas móveis; lareira exterior com banco curvo junto ao canto norte do deck; horta junto à lavandaria, com 3 canteiros elevados nascente–poente e, a norte, junto à sebe, estendal de 5 linhas entre dois postes (≈ 30 m de corda); lugar exterior com carregador AC ao lado da rampa.',
   mat:'Muro à rua rebocado a branco com 1,2 m, com serralharia antracite por cima (barras verticais com topo cortado a 45°, até 2,0 m); portão pedonal e dois portões de correr (lugar exterior e rampa) em aço preto, em linha no mesmo carril atrás do muro: para a garagem correm os dois, para o lugar exterior só o dele; limites laterais e de tardoz com murete, rede e sebe.',
   luz:'Balizadores no caminho pedonal e na rampa; projectores embutidos no deck.',
   nota:'Três entradas pela Rua Dr. Salgado Zenha: pedonal (72,65) até ao alpendre; portão do lugar exterior à cota do piso 0 (72,80); portão da rampa, que contorna o ilhéu relvado até ao pátio da garagem (70,33). O norte real está a 29° do topo da planta.',
@@ -1610,7 +1622,7 @@ function render(r){
   ${r.nota?`<p class="note">${r.nota}</p>`:''}
   <div class="swatches">${r.sw.map(k=>`<span class="sw"><i style="background:${PAL[k]}"></i>${SWN[k]||k}</span>`).join('')}</div>`;
 }
-const SWN={pine:'Pinho',garageFloor:'Betão afagado',wallOut:'Branco',wall:'Reboco',white:'Branco',earth:'Terra',oak:'Carvalho claro',oakDark:'Carvalho fumado',linen:'Bouclé cinza',clay:'Lã areia',leather:'Couro conhaque',cane:'Corda',olive:'Branco mate',stone:'Calcário',stoneDark:'Calcário escovado',azulejo:'Pedra',brass:'Latão',terra:'Betão',iron:'Aço preto',felt:'Feltro',deck:'Deck compósito',plant:'Verde'};
+const SWN={pine:'Pinho',garageFloor:'Betão afagado',wallOut:'Branco',wall:'Reboco',white:'Branco',earth:'Terra',oak:'Carvalho claro',oakDark:'Carvalho fumado',linen:'Bouclé cinza',sofaGreen:'Tecido verde seco',clay:'Lã areia',leather:'Couro conhaque',cane:'Corda',olive:'Branco mate',stone:'Calcário',stoneDark:'Calcário escovado',azulejo:'Pedra',brass:'Latão',terra:'Betão',iron:'Aço preto',felt:'Feltro',deck:'Deck compósito',plant:'Verde'};
 
 // ---------- Câmara / modos ----------
 let mode='p1';
@@ -2038,7 +2050,7 @@ function select(id,fly){
 // rótulos
 const lblWrap=document.getElementById('labels');
 const L=ROOMS.map(r=>{const d=document.createElement('div');d.className='lbl';d.textContent=r.name;lblWrap.appendChild(d);return {r,d}});
-[['Piscina',-11.6,1.0,4.4],['Rampa da garagem',31.5,0.8,5],['Entrada pedonal',10.3,1.8,10.6],['Portão da garagem',31.5,2.2,11.0],['Horta',5.2,1.6,-3.8],['Pátio da garagem',17,-1.5,-3.5],['Lounge',-2.0,1.4,5.8,'lounge'],['Espreguiçadeiras',-5.9,1.0,4.6],['Deck',-3.7,0.6,3],['Lareira exterior',-3.6,1.4,-4.0],['Duche',-12.9,2.4,.8],['Oliveiras',-26.8,3.4,3.9],['Relvado de jogo',-12.2,.9,-4.0],['Casa das máquinas',-15,.6,-.2],['Compóstor de cozinha',4.7,1.5,-5.75],['Compostagem de jardim',-36.4,1.3,8.3],['Estacionamento exterior',27.4,1.4,6.5],['Cesto de basquetebol',12.6,1.4,-3.9],['Escada de serviço',4.83,5.6,.6],['Cinema',-3.4,2.9,7.5,'cinema'],['Sauna',-10.45,2.8,9.35,'sauna'],['Parque infantil',-21.5,3.2,8.0,'play'],['Árvores do canto',-35.2,3.8,9.2,'trees'],['Pinhal',-55,13,-25,'pines'],['Vivenda vizinha',45.5,7.6,3.5],['R. Dr. Francisco Salgado Zenha',20,.6,17],['R. Corredor Carlos Fabião',62,.6,40],['Moradias (lado oposto)',0,7.5,31]].forEach(([n,x,y,z,o])=>{const d=document.createElement('div');d.className='lbl';d.textContent=n;lblWrap.appendChild(d);L.push({r:{name:n,lvl:'site',c:[x,y,z],opt:o},d})});
+[['Piscina',-11.6,1.0,4.4],['Rampa da garagem',31.5,0.8,5],['Entrada pedonal',10.3,1.8,10.6],['Portão da garagem',31.5,2.2,11.0],['Horta',5.2,1.5,-3.7],['Pátio da garagem',17,-1.5,-3.5],['Lounge',-2.0,1.4,5.8,'lounge'],['Espreguiçadeiras',-5.9,1.0,4.6],['Deck',-3.7,0.6,3],['Lareira exterior',-3.6,1.4,-4.0],['Duche',-12.9,2.4,.8],['Oliveiras',-26.8,3.4,3.9],['Relvado de jogo',-12.2,.9,-4.0],['Casa das máquinas',-15,.6,-.2],['Estendal',3.6,2.4,-5.25],['Compostagem de jardim',-36.4,1.3,8.3],['Estacionamento exterior',27.4,1.4,6.5],['Cesto de basquetebol',12.6,1.4,-3.9],['Escada de serviço',4.83,5.6,.6],['Cinema',-3.4,2.9,7.5,'cinema'],['Sauna',-10.45,2.8,9.35,'sauna'],['Parque infantil',-21.5,3.2,8.0,'play'],['Árvores do canto',-35.2,3.8,9.2,'trees'],['Pinhal',-55,13,-25,'pines'],['Vivenda vizinha',45.5,7.6,3.5],['R. Dr. Francisco Salgado Zenha',20,.6,17],['R. Corredor Carlos Fabião',62,.6,40],['Moradias (lado oposto)',0,7.5,31]].forEach(([n,x,y,z,o])=>{const d=document.createElement('div');d.className='lbl';d.textContent=n;lblWrap.appendChild(d);L.push({r:{name:n,lvl:'site',c:[x,y,z],opt:o},d})});
 L.push({r:{name:'Vazio',lvl:1,c:[2.2,F1+.4,5.9]},d:(()=>{const d=document.createElement('div');d.className='lbl';d.textContent='Vazio para a sala';lblWrap.appendChild(d);return d})()});
 const v=new THREE.Vector3();
 function updLabels(){
