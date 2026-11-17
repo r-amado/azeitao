@@ -324,8 +324,7 @@ const glassV=glass.clone(); glassV.opacity=.3;
 const VAO={leaves:[],busy:new Set(),t:0};
 // eixo X: parede ao longo de x (normal z) · eixo Z: parede ao longo de z (normal x) · in: lado interior (+1/−1 na normal) · y0: base do vidro
 const VSPEC=[
- {ax:'X',c:.07,a0:12.6,a1:14.4,y0:FM+1.8,t:'fixbat',in:1,door:'u0',nome:'V18 · janela alta da mud room: 1 fixa + 1 de batente'},
- {ax:'Z',c:14.5,a0:.2,a1:3.0,y0:FM+.9,t:'fixo',nome:'Divisória envidraçada da mud room'},
+ {ax:'X',c:.07,a0:12.22,a1:14.63,y0:FM+1.8,t:'fixbat',in:1,door:'u1',split:13.83,nome:'V18 · janela alta do GYM: fixa 1,61 a poente + batente 0,80 a nascente (v160: 2,41 m desde a parede da escada, como na planta)'},
  {ax:'Z',c:0,a0:4.1,a1:7.85,y0:0,t:'correr',in:1,act:1,top:2.6,nome:'V12 · sala, poente: correr em baixo, bandeira fixa no pé-direito duplo'},
  {ax:'X',c:7.85,a0:4.76,a1:9.0,y0:0,t:'correr',in:-1,act:1,nome:'Sala, sul: porta de correr da zona de jantar'},
  {ax:'Z',c:4.62,a0:.17,a1:3.74,y0:0,t:'correr',in:1,act:1,nome:'V11 · cozinha ↔ refeições exterior'},
@@ -972,9 +971,10 @@ wallX(gm1,6.0,6.85,22.8,FM,-.3,'wallOut',.25);
 wallZ(gm1,22.68,-.04,6.13,FM,-.3,'wallOut',.25);
 wallX(gm1,.95,6.85,10.18,FM,-.3,'wallOut',.25);
 wallX(gm1,1.28,10.18,12.04,FM,-.3,'wallOut',.16);
-wallX(gm1,.07,12.04,12.6,FM,-.3,'wallOut',.25); wallX(gm1,.07,12.6,14.4,FM,FM+1.8,'wallOut',.25); glassX(gm1,.07,12.6,14.4,FM+1.8,FM+2.6,FM); wallX(gm1,.07,12.6,14.4,FM+2.6,-.3,'wallOut',.25); WALLS[WALLS.length-1].base=FM; wallX(gm1,.07,14.4,14.9,FM,-.3,'wallOut',.25); wallX(gm1,.07,20.6,22.8,FM,-.3,'wallOut',.25);
-reg(B(gm1,14.9,20.6,FM+2.4,-.3,-.05,.19,'wallOut'),FM+2.4,-.3,FM);                   // padieira portão
-sectional(gm1,14.95,20.55,FM,2.4,.22);                      // portão seccionado
+wallX(gm1,.07,12.04,12.22,FM,-.3,'wallOut',.25); wallX(gm1,.07,12.22,14.63,FM,FM+1.8,'wallOut',.25); glassX(gm1,.07,12.22,14.63,FM+1.8,FM+2.6,FM); wallX(gm1,.07,12.22,14.63,FM+2.6,-.3,'wallOut',.25); WALLS[WALLS.length-1].base=FM; wallX(gm1,.07,14.63,15.41,FM,-.3,'wallOut',.25); wallX(gm1,.07,21.11,22.8,FM,-.3,'wallOut',.25);
+reg(B(gm1,14.73,14.92,FM,-.3,.195,.81,'wall'),FM,-.3);   // v160: pilar da planta (0,19 × 0,61) na face interior da fachada, no eixo da divisória
+reg(B(gm1,15.41,21.11,FM+2.4,-.3,-.05,.19,'wallOut'),FM+2.4,-.3,FM);                   // padieira portão
+sectional(gm1,15.46,21.06,FM,2.4,.22);                      // portão seccionado
 // interiores
 wallZ(gm1,10.18,1.08,4.9,FM,-.3); wallZ(gm1,10.18,5.7,5.88,FM,-.3);   // técnica | escada (porta)
 wallZ(gm1,12.12,.07,1.28,FM,-.3); wallZ(gm1,12.12,1.28,4.9,FM,-.3); wallZ(gm1,12.12,5.7,5.88,FM,-.3);
@@ -1086,13 +1086,12 @@ function makeCarL(k,parent,x,y,z,rotY){const c=CARS[k],o=c.lo,L=c.L,ex=o.ex,grp=
   grp.children.forEach(q=>q.position.x-=L/2);
   grp.position.set(x,y,z); grp.rotation.y=rotY; grp.userData.car=1; parent.add(grp); return grp;}
 
-// cenário 0 (v152–v155): iX2 (o mais curto) a poente, a direito — 1,08 m até à divisória do lado do condutor; v155: os dois com a frente a 0,10 m dos carris do portão,
-// para sobrar a passagem atrás (0,95 m atrás do iX2 e 0,57 atrás do Model Y, com 5,68 m de fundo no 3D; com 5,34 seriam 0,61 e 0,23); Model Y a nascente,
-// oblíquo a 5°, frente no limite nascente do portão — entre carros 1,06 m à frente, 1,20 m na porta do condutor do Model Y, 1,48 m atrás. Tomadas de carga viradas ao V2C:
-// iX2 atrás à direita, Model Y atrás à esquerda (≈ 3 m de cabo cada)
-makeCar('iX2',OPT.mudwall,16.55,FM,2.647,Math.PI/2); makeCar('MY',OPT.mudwall,19.702,FM,2.840,Math.PI/2+5*Math.PI/180);
-// cenário C1 (v149, opção): iX2 a direito, encostado ao limite poente do portão; Model Y oblíquo a 5°, com a frente no limite nascente do portão e a traseira para a faixa nascente
-makeCar('iX2',OPT.mudopen,16.05,FM,2.647,Math.PI/2); makeCar('MY',OPT.mudopen,19.702,FM,2.840,Math.PI/2+5*Math.PI/180);
+// v160: carros nas posições e no ângulo da planta, de marcha-atrás (traseiras para a parede sul, tomadas de carga viradas ao V2C): iX2 a direito no eixo x 17,03,
+// 1,25 m até ao vidro do lado do condutor e 0,96 m atrás; Model Y a 8° no eixo x 20,14, com a traseira para nascente: 0,90 m entre os carros à frente, ≈ 1,2 m na porta
+// do condutor do Model Y e 1,51 m atrás; os dois com a frente a ≈ 0,10 m dos carris do portão
+makeCar('iX2',OPT.mudwall,17.03,FM,2.647,Math.PI/2); makeCar('MY',OPT.mudwall,20.135,FM,2.840,Math.PI/2+8*Math.PI/180);
+// cenário C1 (v149, opção; v160: acompanha o portão, 0,51 m para nascente): iX2 a direito, encostado ao limite poente do portão; Model Y oblíquo a 5°, frente no limite nascente
+makeCar('iX2',OPT.mudopen,16.56,FM,2.647,Math.PI/2); makeCar('MY',OPT.mudopen,20.212,FM,2.840,Math.PI/2+5*Math.PI/180);
 gm1.add(OPT.ix2pat);   // v153: o iX2 está na garagem — o lugar exterior (com carregador AC) e o pátio ficam sem carro
 // basquetebol: cesto na parede de suporte da escada exterior, virado ao pátio, desviado para norte (aro a ~2,4 m da linha do vidro do passadiço)
 {const cz=-3.9, BOARD=new THREE.MeshStandardMaterial({color:'#FFFFFF',transparent:true,opacity:.75});
@@ -1103,59 +1102,29 @@ gm1.add(OPT.ix2pat);   // v153: o iX2 está na garagem — o lugar exterior (com
  // garrafa (4,4 m de largura) e semicírculo de lance livre
  [[11.9,17.7,cz-2.22,cz-2.18],[11.9,17.7,cz+2.18,cz+2.22],[17.68,17.72,cz-2.2,cz+2.2]].forEach(r=>B(gm1,r[0],r[1],FM,FM+.004,r[2],r[3],'white',true));
  const arc=new THREE.Mesh(new THREE.RingGeometry(1.78,1.82,40,1,-Math.PI/2,Math.PI),mat('white'));arc.rotation.x=-Math.PI/2;arc.position.set(17.7,FM+.004,cz);gm1.add(arc);}
-// faixa nascente da garagem (fora do alinhamento do portão): 4 bicicletas na parede norte, ao lado do portão (suportes rotativos, alturas desencontradas) + 4 estantes metálicas na parede nascente
-{const tm=mat('#1A1A1A');[21.0,21.45,21.9,22.35].forEach((x,i)=>{const dy=(i%2)*.3;B(gm1,x-.05,x+.05,FM+1.9+dy,FM+2.05+dy,.2,.35,'iron');
-   [FM+1.75+dy,FM+.65+dy].forEach(y=>{const w=new THREE.Mesh(new THREE.TorusGeometry(.34,.025,8,28),tm);w.position.set(x,y,.5);gm1.add(w);});
-   const c=['#C3262B','#2E6FD8','#3A3A3A','#E3B04B'][i]; B(gm1,x-.02,x+.02,FM+.65+dy,FM+1.75+dy,.48,.52,c); B(gm1,x-.35,x+.02,FM+1.1+dy,FM+1.14+dy,.48,.52,c);});
- [[.95,2.15],[2.2,3.4],[3.45,4.65],[4.7,5.85]].forEach(([z0,z1])=>{[[z0,z0+.04],[z1-.04,z1]].forEach(([a,b])=>[22.0,22.5].forEach(x=>B(gm1,x,x+.04,FM,FM+2.0,a,b,'iron')));
-   [.1,.55,1.0,1.45,1.9].forEach(h=>B(gm1,22.0,22.54,FM+h,FM+h+.03,z0,z1,'steel'));
-   [.13,.58,1.03,1.48].forEach((h,k)=>{B(gm1,22.05,22.48,FM+h,FM+h+.3,z0+.08,z0+.55,['#C9CCCE','#7FA36B','#5D7FA6','#C8B48F'][k],true);B(gm1,22.05,22.48,FM+h,FM+h+.3,z0+.62,z1-.08,['#C8B48F','#C9CCCE','#E3B04B','#7FA36B'][k],true);});});}
-// mud room, cenário 0 (v152): ≈ 13 m² ao longo da escada; divisória em pladur hidrófugo (0,10 m) em x 14,50. Metade norte: murete até 1,10 m, com perfil de protecção do lado
-// da garagem (as portas do iX2 abrem para aí), e vidro laminado até ao tecto, que leva a luz da janela alta à garagem; metade sul em pladur até ao tecto, com cacifo e nicho
-// do lado da mud room; porta de vidro com aro preto (0,90 × 2,10) junto à P08, a abrir para dentro da mud room; zona de treino junto à janela
-B(OPT.mudwall,12.2,14.45,FM,FM+.012,.2,5.88,'stoneDark',true);
-wallZ(OPT.mudwall,14.5,.2,3.0,FM,FM+1.1,'wall',.1); glassZ(OPT.mudwall,14.5,.2,3.0,FM+1.1,-.3,FM); B(OPT.mudwall,14.45,14.55,FM+1.1,FM+1.125,.2,3.0,'#2A2A2A',true);
-B(OPT.mudwall,14.55,14.572,FM+.55,FM+.95,1.5,4.4,'#2A2A2A');
-wallZ(OPT.mudwall,14.5,3.0,4.5,FM,-.3,'wall',.1); wallZ(OPT.mudwall,14.5,5.4,5.88,FM,-.3,'wall',.1);
-wallZ(OPT.mudwall,14.5,4.5,5.4,FM+2.1,-.3,'wall',.1); WALLS[WALLS.length-1].base=FM;
-vDoor(OPT.mudwall,{ax:'Z',c:14.5,a0:4.5,a1:5.4,y0:FM,y1:FM+2.1,in:-1,hinge:0,th:.04,base:FM,aro:mat('#1E1E1E'),ad:.06,nome:'Porta da mud room (vidro, abre para dentro da mud room)'});
-{const COLS=['#5D7FA6','#E3B04B','#7FA36B','#C3262B','#3A3A3A','#B9965F'];
- const locker=(xb,xf,z0,c,G=OPT.mudwall)=>{const s=Math.sign(xf-xb),xi=xb+s*.05,xo=xf-s*.05,x0=Math.min(xb,xf),x1=Math.max(xb,xf);
-   B(G,x0,x1,FM,FM+2.1,z0,z0+.02,'oak'); B(G,Math.min(xi,xo),Math.max(xi,xo),FM+.45,FM+.5,z0+.02,z0+.6,'oak'); B(G,Math.min(xi,xo),Math.max(xi,xo),FM+1.75,FM+1.78,z0+.02,z0+.6,'oak');
-   B(G,Math.min(xb+s*.02,xb+s*.1),Math.max(xb+s*.02,xb+s*.1),FM+1.35,FM+1.45,z0+.25,z0+.35,'iron'); B(G,Math.min(xi,xo-s*.05),Math.max(xi,xo-s*.05),FM+1.8,FM+2.0,z0+.1,z0+.52,'linen');
-   B(G,Math.min(xi,xo),Math.max(xi,xo),FM+.05,FM+.18,z0+.08,z0+.54,c,true);};
- for(let i=0;i<4;i++) locker(12.2,12.7,2.32+i*.62,COLS[i]);
- B(OPT.mudwall,12.2,12.7,FM,FM+2.1,4.8,4.82,'oak'); B(OPT.mudwall,12.2,12.7,FM+2.1,FM+2.15,2.32,4.82,'oak');
- const MW=OPT.mudwall; locker(14.45,13.95,3.72,COLS[4],MW);
- B(MW,13.95,14.45,FM,FM+2.1,4.34,4.36,'oak'); B(MW,13.95,14.45,FM+2.1,FM+2.15,3.1,4.36,'oak');
- // nicho aberto para bolas e capacetes
- B(MW,14.4,14.45,FM,FM+2.1,3.12,3.72,'oak'); B(MW,13.95,14.45,FM,FM+2.1,3.1,3.12,'oak');
- [FM+.55,FM+1.15,FM+1.75].forEach(y=>B(MW,13.95,14.4,y,y+.02,3.12,3.72,'oak'));
- [[FM+.12,'#D9480F'],[FM+.69,'#FFFFFF'],[FM+1.29,'#3A3A3A']].forEach(([y,c])=>ball(MW,14.17,y,3.42,.12,c));}
-// espaldar de madeira (≈ 0,85 × 2,25 m) com barra de elevações, na parede poente
-B(OPT.mudwall,12.22,12.32,FM,FM+2.25,1.3,1.37,'pine'); B(OPT.mudwall,12.22,12.32,FM,FM+2.25,2.08,2.15,'pine');
-for(let y=FM+.15;y<FM+2.1;y+=.16) B(OPT.mudwall,12.24,12.3,y,y+.035,1.37,2.08,'pine');
-[1.3,2.08].forEach(z=>B(OPT.mudwall,12.32,12.85,FM+2.12,FM+2.2,z,z+.07,'pine')); B(OPT.mudwall,12.8,12.85,FM+2.12,FM+2.17,1.3,2.15,'pine');
-// pavimento da zona de treino: tapete puzzle em EVA (encaixes) sobre o grés
-B(OPT.mudwall,12.32,14.44,FM+.012,FM+.03,.22,2.3,'#4A4D50',true);
-for(let z=.82;z<2.3;z+=.6) B(OPT.mudwall,12.32,14.44,FM+.03,FM+.031,z,z+.01,'#3A3C3E',true); for(let x=12.92;x<14.44;x+=.6) B(OPT.mudwall,x,x+.01,FM+.03,FM+.031,.22,2.3,'#3A3C3E',true);
-// tecto em betão à vista com esteiras técnicas: geradas a partir de redes.json (ver RAIO-X) — anel na ZT, ligação sobre o patamar da escada, EG-1 a sul (fora do portão) e EG-2 sobre os cacifos
-// banco de treino com arrumação de halteres (110 × 35 cm) sob a janela
-B(OPT.mudwall,12.35,13.45,FM,FM+.38,.25,.6,'pine'); B(OPT.mudwall,12.37,13.03,FM+.38,FM+.44,.27,.58,'#1A1A1A'); B(OPT.mudwall,13.07,13.43,FM+.38,FM+.44,.27,.58,'#1A1A1A');
-[12.6,12.85].forEach(x=>{B(OPT.mudwall,x,x+.04,FM+.08,FM+.25,.33,.52,'#2A2A2A');});
-// máquina de remo (tipo Concept2, 2,44 × 0,61 m) ao longo do vidro, virada para a janela
-{const rx=13.97;
- B(OPT.mudwall,rx-.07,rx+.07,FM+.28,FM+.36,.75,2.72,'iron'); B(OPT.mudwall,rx-.28,rx+.28,FM,FM+.06,2.62,2.74,'iron');
- const fw=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.18,24),mat('#1A1A1A'));fw.rotation.z=Math.PI/2;fw.position.set(rx,FM+.42,.5);OPT.mudwall.add(fw);
- B(OPT.mudwall,rx-.3,rx+.3,FM,FM+.06,.3,.62,'iron'); B(OPT.mudwall,rx-.22,rx+.22,FM+.25,FM+.33,.95,1.2,'#1A1A1A');
- B(OPT.mudwall,rx-.15,rx+.15,FM+.36,FM+.44,1.7,2.0,'#1A1A1A'); cyl(OPT.mudwall,rx,.62,.015,FM+.6,FM+1.05,'iron'); B(OPT.mudwall,rx-.1,rx+.1,FM+1.0,FM+1.15,.6,.64,'#1A1A1A');}
+// v160: garagem igual à planta do arquitecto — faixa de 2,55 m ao longo da escada, separada da garagem por uma divisória de vidro com caixilho preto no eixo
+// do pilar (x 14,815), do pilar à parede sul, sem porta (a planta não a tem): vidro até 2,05 m e bandeira de pladur até à laje, por onde passam a EG-1, a água
+// da IS2, o esgoto AR-D1 e a conduta da bomba de calor. A norte o GYM, em borracha
+// preta (1,76 × 2,26, a 0,38 m da parede da escada e a 0,70 m da fachada, sem equipamento); a 3,46 m da fachada uma parede de lado a lado e, do lado sul, o roupeiro
+// de carvalho (0,59 de fundo, 2,40 de altura, 5 portas, uma por pessoa), virado para a P08
+{const MW=OPT.mudwall, XG=14.815, K='#1E1F21', Z0=.81, Z1=5.88;
+ reg(B(MW,XG-.006,XG+.006,FM+.05,FM+2.02,Z0,Z1,glassV,true),FM+.05,FM+2.02,FM);
+ reg(B(MW,XG-.045,XG+.045,FM,FM+.05,Z0,Z1,K),FM,FM+.05,FM); reg(B(MW,XG-.045,XG+.045,FM+2.02,FM+2.05,Z0,Z1,K),FM+2.02,FM+2.05,FM);
+ reg(B(MW,XG-.045,XG+.045,FM+2.05,-.3,Z0,Z1,'wall'),FM+2.05,-.3,FM);
+ for(let i=0;i<=5;i++){const z=Z0+i*(Z1-Z0)/5; reg(B(MW,XG-.03,XG+.03,FM+.05,FM+2.02,Math.max(Z0,z-.025),Math.min(Z1,z+.025),K),FM+.05,FM+2.02,FM);}
+ B(MW,12.61,14.37,FM+.01,FM+.025,.9,3.16,'#1C1D1F',true);
+ B(MW,13.61,13.616,FM+.025,FM+.026,.9,3.16,'#2C2D30',true); [1.9,2.9].forEach(z=>B(MW,12.61,14.37,FM+.025,FM+.026,z,z+.006,'#2C2D30',true));
+ wallX(MW,3.755,12.22,14.77,FM,-.3,'wall',.19);
+ const W5=(14.69-12.22)/5; B(MW,12.22,14.69,FM,FM+2.4,3.85,4.42,'oak'); B(MW,12.22,14.69,FM,FM+.06,4.42,4.44,'#2A2A2A');
+ for(let i=0;i<5;i++){const a=12.22+i*W5; B(MW,a+.003,a+W5-.003,FM+.065,FM+2.395,4.42,4.44,'oak'); B(MW,a+W5-.06,a+W5-.045,FM+.9,FM+1.4,4.44,4.455,'iron');}}
+// tecto em betão à vista com esteiras técnicas, geradas a partir de redes.json (ver RAIO-X): anel na ZT, ligação sobre o patamar da escada, EG-1 a sul (fora do portão) e EG-2 ao longo da escada
 // ================= v149: garagem em cenário C1 (proposta) — sem divisória; a faixa junto à escada (x 12,22–14,90) fica aberta à garagem =================
 // cacifos ao longo da parede da escada (5 × 0,60 m, z 1,90–4,90) e banco corrido em frente; entrada pela P08 em grés antiderrapante com ralo e tapete de grelha;
 // canto de treino a norte: espaldar na parede da escada (a janela alta V18 ocupa a parede norte) e máquina de remo debaixo da janela, sobre tapete puzzle em EVA
 {const g=OPT.mudopen, COLS=['#5D7FA6','#E3B04B','#7FA36B','#C3262B','#3A3A3A'], XB=12.22, XF=12.72;
  // pavimentos: EVA no canto de treino, grés na zona de entrada (até x 14,20), ralo e tapete de grelha junto à P08
- B(g,XB,14.85,FM,FM+.03,.2,1.88,'#4A4D50',true);
- for(let z=.8;z<1.88;z+=.6) B(g,XB,14.85,FM+.03,FM+.031,z,z+.01,'#3A3C3E',true); for(let x=12.82;x<14.85;x+=.6) B(g,x,x+.01,FM+.03,FM+.031,.2,1.88,'#3A3C3E',true);
+ B(g,XB,14.72,FM,FM+.03,.2,1.88,'#4A4D50',true);
+ for(let z=.8;z<1.88;z+=.6) B(g,XB,14.72,FM+.03,FM+.031,z,z+.01,'#3A3C3E',true); for(let x=12.82;x<14.72;x+=.6) B(g,x,x+.01,FM+.03,FM+.031,.2,1.88,'#3A3C3E',true);
  B(g,XB,14.2,FM,FM+.014,1.88,5.875,'stoneDark',true);
  B(g,12.925,13.075,FM+.014,FM+.017,4.545,4.695,'steel',true); for(let x=12.94;x<13.07;x+=.03) B(g,x,x+.012,FM+.017,FM+.018,4.56,4.68,'#2A2A2A',true);
  B(g,12.3,13.2,FM+.014,FM+.03,4.98,5.78,'#2B2D30',true); for(let z=5.02;z<5.76;z+=.06) B(g,12.32,13.18,FM+.03,FM+.032,z,z+.012,'#4A4D50',true);
@@ -1171,10 +1140,10 @@ B(OPT.mudwall,12.35,13.45,FM,FM+.38,.25,.6,'pine'); B(OPT.mudwall,12.37,13.03,FM
  for(let y=FM+.15;y<FM+2.1;y+=.16) B(g,XB+.02,XB+.08,y,y+.035,1.07,1.78,'pine');
  [1.0,1.78].forEach(z=>B(g,XB+.1,12.85,FM+2.12,FM+2.2,z,z+.07,'pine')); B(g,12.8,12.85,FM+2.12,FM+2.17,1.0,1.85,'pine');
  // máquina de remo (tipo Concept2, 2,44 × 0,61 m) ao longo da parede norte, debaixo da janela alta
- {const rz=.64; B(g,12.62,14.78,FM+.28,FM+.36,rz-.07,rz+.07,'iron'); B(g,14.66,14.78,FM,FM+.06,rz-.28,rz+.28,'iron'); B(g,12.4,12.72,FM,FM+.06,rz-.3,rz+.3,'iron');
-  const fw=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.18,24),mat('#1A1A1A')); fw.rotation.x=Math.PI/2; fw.position.set(12.56,FM+.42,rz); fw.castShadow=true; g.add(fw);
-  B(g,12.95,13.2,FM+.25,FM+.33,rz-.22,rz+.22,'#1A1A1A'); B(g,13.7,14.0,FM+.36,FM+.44,rz-.15,rz+.15,'#1A1A1A');
-  cyl(g,12.66,rz,.015,FM+.6,FM+1.05,'iron'); B(g,12.62,12.66,FM+1.0,FM+1.15,rz-.1,rz+.1,'#1A1A1A');}}
+ {const rz=.64; B(g,12.52,14.68,FM+.28,FM+.36,rz-.07,rz+.07,'iron'); B(g,14.56,14.68,FM,FM+.06,rz-.28,rz+.28,'iron'); B(g,12.3,12.62,FM,FM+.06,rz-.3,rz+.3,'iron');
+  const fw=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.18,24),mat('#1A1A1A')); fw.rotation.x=Math.PI/2; fw.position.set(12.46,FM+.42,rz); fw.castShadow=true; g.add(fw);
+  B(g,12.85,13.1,FM+.25,FM+.33,rz-.22,rz+.22,'#1A1A1A'); B(g,13.6,13.9,FM+.36,FM+.44,rz-.15,rz+.15,'#1A1A1A');
+  cyl(g,12.56,rz,.015,FM+.6,FM+1.05,'iron'); B(g,12.52,12.56,FM+1.0,FM+1.15,rz-.1,rz+.1,'#1A1A1A');}}
 // portas corta-fogo com fecho automático (numeração da planta do piso −1): P08 garagem ↔ escada (fronteira do compartimento da garagem) e P07 zona técnica ↔ escada
 fireDoor(gm1,12.12,'P08 · porta corta-fogo EI 30 escada ↔ garagem (fecha sozinha)'); fireDoor(gm1,10.18,'P07 · porta corta-fogo escada ↔ zona técnica (fecha sozinha)');
 
@@ -2061,18 +2030,18 @@ const ROOMS=[
   luz:'Perfil LED no topo dos roupeiros; espelho retroiluminado no i.s.',
   nota:'O vestuário e a zona baixa da suite (faixa sul) têm tecto a ≈2,40: a cobertura por cima é 0,50 m mais baixa que a principal (75,72 contra 76,21) e não há tecto falso — a iluminação vai embebida na laje. Medidas de obra (14/11/2026): suite 2,78 m em bruto (2,73 acabada) e WC 1,90 m em bruto; com o pano novo o WC fica com 1,79 em bruto e ≈ 1,74 acabado (projecto 1,70). Aos pés da cama ficam 0,55 m livres até à parede da TV (2,73 − 0,10 da cabeceira − 2,08 da cama; a TV está dentro do nicho) — é a única passagem para o lado norte da cama e para a porta norte. A cabeceira vai de z 1,08 a 4,28 (v155, cama 0,50 m para norte): ≈ 0,6 m livres a norte e ≈ 0,7 m a sul, onde ficam o interruptor da entrada e o NSPanel; as tomadas das mesas ficam nas pontas da cabeceira e os interruptores da cabeceira por cima das mesas, acima dos painéis laterais. Entre a cama e a parede norte ficam ≈ 1,1 m. No 3D o conjunto suite + WC é ≈ 12 cm mais estreito do que em obra: o WC aparece com 1,62 m.',
   sw:['oak','leather','stone','brass']},
- {id:'garagem',lvl:-1,name:'Garagem',area:'≈ 46 m² (cenário 0; a mud room fechada tem ≈ 13 m²)',c:[18.5,FM+1.2,3.0],
-  mob:'Cenário 0 (v152, por omissão; a opção «cenário C1» mostra a garagem sem divisória): mud room fechada ao longo da escada, com divisória em pladur e vidro e porta de vidro. BMW iX2 eDrive20 M Sport (4,55 × 1,85 m; 2,10 m com espelhos), o mais curto, a poente e a direito — 1,08 m livres até à divisória do lado do condutor, para passar da mud room para os carros —, e Tesla Model Y Juniper Long Range AWD (4,79 × 1,92 m; 2,13 m com espelhos) a nascente, ligeiramente oblíquo (≈ 5°, ocupa 4,94 m de fundo), com a frente no limite nascente do portão e a traseira para a faixa nascente — 1,06 m entre os carros à frente, 1,20 m na porta do condutor do Model Y e 1,48 m atrás; os dois com a frente a 0,10 m dos carris do portão (v155), o que deixa 0,95 m atrás do iX2 e 0,57 m atrás do Model Y até à parede sul; ambos de marcha-atrás, para saírem de frente; o lugar exterior, com carregador AC, fica livre; 4 bicicletas na parede norte ao lado do portão e 4 estantes metálicas na parede nascente; um carregador V2C Alva duplo na parede sul, entre os dois carros (duas tomadas Tipo 2, uma só alimentação 5G10 do Q-1; limitado a 11 kW por tomada na app e gerido pelo ControlBox). As tomadas de carga ficam as duas viradas para ele — o iX2 carrega atrás à direita e o Model Y atrás à esquerda —, com ≈ 3 m de cabo cada. O pátio em frente tem cesto de basquetebol na parede de suporte da escada exterior, desviado para norte (longe do vidro do passadiço), e marcação de garrafa no pavimento; os contentores do lixo ficam num abrigo por baixo da janela alta da mud room (V18), encostado à fachada.',
+ {id:'garagem',lvl:-1,name:'Garagem',area:'≈ 44 m² (v160, planta do arquitecto: 59,20 m² com o GYM e o roupeiro)',c:[18.5,FM+1.2,3.0],
+  mob:'v160 — igual à planta do arquitecto (garagem 59,20 m², 10,35 × 5,70 m, com o GYM): portão seccionado de 5,70 m a 3,19 m da parede da escada (x 15,41–21,11, 0,51 m para nascente do que estava). BMW iX2 eDrive20 M Sport (4,55 × 1,85 m; 2,10 m com espelhos) a poente, a direito, no eixo do carro da planta (x 17,03) — 1,25 m livres até à divisória de vidro do lado do condutor —, e Tesla Model Y Juniper Long Range AWD (4,79 × 1,92 m; 2,13 m com espelhos) a nascente, oblíquo a ≈ 8° como na planta (eixo x 20,14), com a traseira para nascente — 0,90 m entre os carros à frente, ≈ 1,2 m na porta do condutor do Model Y e 1,51 m atrás. Os dois de marcha-atrás, para saírem de frente, com a frente a ≈ 0,10 m dos carris do portão: ficam 0,96 m atrás do iX2 e 0,53 m atrás do Model Y até à parede sul. Carregador V2C Alva duplo na parede sul, atrás do iX2 (duas tomadas Tipo 2, uma só alimentação 5G10 do Q-1; limitado a 11 kW por tomada na app e gerido pelo ControlBox): as tomadas de carga ficam viradas para ele — o iX2 carrega atrás à direita (≈ 1 m) e o Model Y atrás à esquerda (≈ 1,6 m). O lugar exterior, com carregador AC, fica livre. Saem as bicicletas e as estantes da faixa nascente, que não estão na planta. (A opção «cenário C1» mostra a alternativa sem divisória.) O pátio em frente tem cesto de basquetebol na parede de suporte da escada exterior, desviado para norte (longe do vidro do passadiço), e marcação de garrafa no pavimento; os contentores do lixo ficam num abrigo por baixo da janela alta do GYM (V18), encostado à fachada.',
   mat:'Pavimento em betão afagado ou resina cinza; paredes pintadas a branco; portão seccionado a norte, com acesso pela rampa; a fachada norte, virada ao pátio, é em cinza escuro como a dos quartos por cima do passadiço. No pátio, por baixo da escada exterior, um arrumo com portas de lâminas para as almofadas e os coletes da piscina no Inverno.',
   luz:'Calhas LED lineares no tecto, com sensor de presença.',
-  nota:'O pé-direito livre é de 2,70 m sob a laje. Confirme a altura útil do portão seccionado com o fornecedor. Fundo: 5,70 m entre paredes na planta 04 (5,68 no 3D); o Ricardo indica 5,34 m (16/11) — com 5,34 ficariam 0,61 m atrás do iX2 e ≈ 0,23 m atrás do Model Y oblíquo (≈ 0,38 a direito): atrás do Model Y não há passagem, passa-se entre os carros (1,06–1,48 m).',
+  nota:'O pé-direito livre é de 2,70 m sob a laje. Confirme a altura útil do portão seccionado com o fornecedor. Fundo: 5,70 m entre paredes na planta (5,68 no 3D); o Ricardo indica 5,34 m (16/11) — com 5,34 ficariam ≈ 0,61 m atrás do iX2 e ≈ 0,19 m atrás do Model Y: atrás do Model Y não há passagem, passa-se entre os carros (0,90–1,51 m). v160: portão, janela, pilar e divisória tirados da planta do arquitecto (±0,05 m); antes o portão estava em x 14,90–20,60.',
   sw:['garageFloor','wallOut','iron']},
- {id:'mudroom',lvl:-1,name:'Mud room e treino',area:'≈ 13 m² (2,30 × 5,70 m, fechada)',c:[13.5,FM+1.2,3.0],
-  mob:'Cenário 0 (v152): mud room fechada ao longo da escada. Divisória em pladur: a norte, murete de 1,10 m com perfil de protecção do lado da garagem (as portas do iX2 abrem para ele) e vidro laminado até ao tecto, que leva a luz da janela alta à garagem; a sul, pladur até ao tecto, com um cacifo e um nicho para bolas e capacetes do lado da mud room; porta de vidro com aro preto (0,90 × 2,10) junto à P08, a abrir para dentro da mud room. Quatro cacifos de 60 cm na parede da escada, um por pessoa, com banco, gaveta de sapatos, cabide e cesto. A norte, zona de treino: espaldar com barra de elevações na parede da escada, banco de halteres debaixo da janela e máquina de remo ao longo do vidro. (Ligando a opção «cenário C1», aparece a alternativa sem divisória.)',
-  mat:'Grés antiderrapante e tapete puzzle em EVA na zona de treino; divisória em pladur hidrófugo de placa dupla, com murete de 1,10 m e vidro laminado por cima; porta de vidro temperado com aro em alumínio preto. A divisória fecha o pó, a lama, os fumos e o frio da garagem. Janela alta a 1,80 m para o pátio.',
-  luz:'A luz da janela alta chega à garagem pelo vidro. Calhas LED com sensor de presença; interruptor da mud room nos dois acessos (P08 e porta da garagem, do lado do trinco) e teclado do alarme junto à P08.',
-  nota:'Fica no percurso natural: carro → porta de vidro → cacifos → P08 → escada → casa. A P08 (corta-fogo EI 30, fecha sozinha) continua a separar a escada; a porta da mud room não precisa de ser corta-fogo. Medidas do 3D (±0,10 m) — confirmar em obra.',
-  sw:['oak','stoneDark','wall','linen']},
+ {id:'mudroom',lvl:-1,name:'GYM e roupeiro',area:'≈ 14 m² (2,55 × 5,68 m: GYM ≈ 8,8 m² + zona do roupeiro ≈ 5,2 m²)',c:[13.5,FM+1.2,3.0],
+  mob:'v160 — igual à planta do arquitecto: faixa de 2,55 m ao longo da escada, separada da garagem por uma divisória de vidro com caixilho preto, do pilar (0,19 × 0,61) à parede sul — sem porta, como na planta —, com vidro até 2,05 m e bandeira de pladur até à laje. A norte, o GYM: pavimento em borracha preta de 1,76 × 2,26 m, a 0,38 m da parede da escada e a 0,70 m da fachada, sem equipamento, com a janela alta V18 (2,41 m). A 3,46 m da fachada, uma parede de 0,19 m de lado a lado e, encostado a ela do lado sul, um roupeiro de carvalho com 0,59 m de fundo e 2,40 m de altura, com cinco portas (uma por pessoa). A P08 dá para a zona do roupeiro, com 1,44 m livres à frente das portas. (Ligando a opção «cenário C1», aparece a alternativa sem divisória.)',
+  mat:'Divisória em vidro laminado com caixilho preto até 2,05 m e bandeira de pladur pintada a branco até à laje, por onde passam a esteira EG-1, a água da IS2 (AF, AQ e retorno a ≈ 2,45 m), o esgoto AR-D1 (≈ 2,1 m, junto à parede sul) e a conduta da bomba de calor (≈ 2,3 m); roupeiro em carvalho claro; GYM em borracha sobre o pavimento da garagem. Janela alta V18 a 1,80 m, com 2,41 m como na planta: fixa a poente (1,61) e de batente a nascente (0,80).',
+  luz:'A luz da janela alta chega à garagem pelo vidro. Calhas LED com sensor de presença (uma no GYM, outra à frente do roupeiro); interruptor e teclado do alarme junto à P08.',
+  nota:'Como está na planta, o GYM fica fechado nos quatro lados (parede do roupeiro de lado a lado e vidro sem porta) e a garagem não tem ligação interior à casa: da P08 só se chega à zona do roupeiro. Falta uma porta na divisória ou na parede do roupeiro — a confirmar com o arquitecto. Medidas tiradas da planta (±0,05 m).',
+  sw:['oak','garageFloor','wall','iron']},
  {id:'tecnica',lvl:-1,name:'Zona técnica',area:'14,46 m²',c:[8.6,FM+1.2,3.4],
   mob:'Parede poente, de norte para sul: baterias FoxESS EP12 (2, base a 0,50 m do chão), inversor com a caixa de junção HV por baixo e, ao lado, a caixa de seccionamento AC do inversor (GRID e EPS, de onde sobem os 2 × 5G10 para a EPS Box no piso 0), mini ATI (com armário baixo por baixo); coluna de lavandaria com a máquina elevada sobre gaveta extraível e armário por cima; bomba de calor LG no canto sudoeste, com vasos de expansão e bomba de recirculação de AQS ao lado, e ralo de pavimento. Parede norte, de poente para nascente: 2.ª coluna de 2 baterias e o Q-1 (quadro da zona técnica e da garagem, alimentado do QE do piso 0 pelo 5G25 do projecto, do lado com backup; 3 filas × 18 módulos, porta que abre). Na parede poente, no lugar do antigo módulo de arrumação: o mini ATI (ZAP da zona técnica com o ONT do operador, painel de 24 RJ45, switch PoE+ de 16 portas para as câmaras e os Deco, switch de 8 e gravador das câmaras), ligado ao ATI do hall, e um armário baixo de arrumação. O canto nordeste fica livre para a porta da coluna da bancada abrir. Q-1 e mini ATI são propostas do raio-X R01; a entrada de energia, o contador FoxESS e a EPS Box ficam no QE do hall (v150), como no projecto. Na parede nascente, 1,13 m a norte da P07, há um pilar (≈ 0,26 × 0,27 m, planta do piso −1) que sobressai ≈ 0,12 m para a zona técnica: a bancada contorna-o (tampo recortado, armário de 2 portas menos fundo, painel perfurado e armários altos interrompidos) e a tomada da bancada fica na face do pilar. Parede nascente: sistema metálico preto com bancada em madeira (colunas nas pontas, gavetas, carro de ferramentas, armário de 2 portas, painel perfurado e armários altos).',
   mat:'Pavimento em grés técnico com ralo junto à máquina; paredes laváveis; grelhas de ventilação.',
@@ -2113,7 +2082,7 @@ const ROOMS=[
 // ---------- Panorâmicas 360° (imagens geradas no Higgsfield) ----------
 // No GitHub Pages: ficheiros na pasta pano/. No artefacto do Claude: ficheiros anexos (PANO_BLOB preenchido ao carregar).
 const PANOS={sala:[['Sala e jantar','sala']],cozinha:[['Cozinha','cozinha']],escritorio:[['Escritório','escritorio']],quarto1:[['Quarto do piso 1','quarto-piso1']],
-  suite:[['Suite','suite'],['Vestiário','vestiario']],q1:[['Quarto 1','quarto1']],q2:[['Quarto da bebé','quarto-bebe']],garagem:[['Garagem e mud room','garagem']],mudroom:[['Garagem e mud room','garagem']],
+  suite:[['Suite','suite'],['Vestiário','vestiario']],q1:[['Quarto 1','quarto1']],q2:[['Quarto da bebé','quarto-bebe']],garagem:[['Garagem e GYM','garagem']],mudroom:[['Garagem e GYM','garagem']],
   pergola:[['Deck e piscina','deck']],exterior:[['Deck e piscina','deck'],['Entrada pela rua','rua']],terraco:[['Terraço','terraco']]};
 const PANO_BLOB={};
 const PV={on:false,lon:0,lat:0,fov:75,drag:null,scene:new THREE.Scene(),cam:new THREE.PerspectiveCamera(75,1,.1,200),mesh:null,cache:{}};
